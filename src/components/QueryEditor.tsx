@@ -1,32 +1,75 @@
-import React, { ChangeEvent } from 'react';
-import { InlineField, Input } from '@grafana/ui';
-import { QueryEditorProps } from '@grafana/data';
-import { DataSource } from '../datasource';
-import { MyDataSourceOptions, MyQuery } from '../types';
+import React from 'react';
+import {InlineField, RadioButtonGroup, InlineFieldRow} from '@grafana/ui';
+import {QueryEditorProps, SelectableValue} from '@grafana/data';
+import {DeepDataSource} from '../DeepDataSource';
+import {DeepQLSearch} from './DeepQLSearch'
+import {DeepQueryType, MyDataSourceOptions, DeepQuery} from '../types';
+import {config, reportInteraction} from "@grafana/runtime";
+import NativeSearch from "./NativeSearch";
 
-type Props = QueryEditorProps<DataSource, MyQuery, MyDataSourceOptions>;
+export type Props = QueryEditorProps<DeepDataSource, DeepQuery, MyDataSourceOptions>;
 
-export function QueryEditor({ query, onChange, onRunQuery }: Props) {
-  const onQueryTextChange = (event: ChangeEvent<HTMLInputElement>) => {
-    onChange({ ...query, queryText: event.target.value });
-  };
+export function QueryEditor({query, onChange, onRunQuery, app, datasource, onBlur}: Props) {
 
-  const onConstantChange = (event: ChangeEvent<HTMLInputElement>) => {
-    onChange({ ...query, constant: parseFloat(event.target.value) });
-    // executes the query
-    onRunQuery();
-  };
+    let queryTypeOptions: Array<SelectableValue<DeepQueryType>> = [
+        { value: 'deepql', label: 'DeepQL' },
+        { value: 'search', label: 'Search' },
+    ];
 
-  const { queryText, constant } = query;
+    function onClearResults() {
+        console.log("onClearResults")
+    }
 
-  return (
-    <div className="gf-form">
-      <InlineField label="Constant">
-        <Input onChange={onConstantChange} value={constant} width={8} type="number" step="0.1" />
-      </InlineField>
-      <InlineField label="Query Text" labelWidth={16} tooltip="Not used yet">
-        <Input onChange={onQueryTextChange} value={queryText || ''} />
-      </InlineField>
-    </div>
-  );
+    if (!query.queryType) {
+        query.queryType = "deepql"
+    }
+
+    return (
+        <>
+            <InlineFieldRow>
+                <InlineField label="Query type">
+                    <RadioButtonGroup<DeepQueryType>
+                        options={queryTypeOptions}
+                        value={query.queryType}
+                        onChange={(v) => {
+                            reportInteraction('grafana_snapshot_query_type_changed', {
+                                datasourceType: 'deep',
+                                app: app ?? '',
+                                grafana_version: config.buildInfo.version,
+                                newQueryType: v,
+                                previousQueryType: query.queryType ?? '',
+                            });
+
+                            onClearResults();
+
+                            onChange({
+                                ...query,
+                                queryType: v,
+                            });
+                        }}
+                        size="md"
+                    />
+                </InlineField>
+            </InlineFieldRow>
+            {query.queryType === 'search' && (
+                <NativeSearch
+                    datasource={datasource}
+                    query={query}
+                    onChange={onChange}
+                    onBlur={onBlur}
+                    onRunQuery={onRunQuery}
+                />
+            )}
+            {query.queryType === 'deepql' && (
+                <DeepQLSearch
+                    datasource={datasource}
+                    query={query}
+                    onChange={onChange}
+                    onBlur={onBlur}
+                    onRunQuery={onRunQuery}
+                />
+            )}
+        </>
+    );
+
 }

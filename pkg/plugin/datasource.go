@@ -37,7 +37,15 @@ func NewDeepDatasource(settings backend.DataSourceInstanceSettings) (instancemgm
 }
 
 func buildHttpClient(settings backend.DataSourceInstanceSettings) (*http.Client, error) {
-	return httpclient.New()
+	mw, err := getMiddlewares(settings)
+	if err != nil {
+		return nil, err
+	}
+	return httpclient.New(mw)
+}
+
+func getMiddlewares(settings backend.DataSourceInstanceSettings) (httpclient.Options, error) {
+	return settings.HTTPClientOptions()
 }
 
 // DeepDatasource is an example datasource which can respond to data queries, reports
@@ -73,7 +81,11 @@ func (d *DeepDatasource) QueryData(ctx context.Context, req *backend.QueryDataRe
 	return response, nil
 }
 
-type queryModel struct{}
+type queryModel struct {
+	Search      string `json:"search"`
+	ServiceName string `json:"serviceName"`
+	Limit       uint   `json:"limit"`
+}
 
 func (d *DeepDatasource) query(_ context.Context, pCtx backend.PluginContext, query backend.DataQuery) backend.DataResponse {
 	var response backend.DataResponse

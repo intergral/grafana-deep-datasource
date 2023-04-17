@@ -1,12 +1,36 @@
 import { DataQuery, DataSourceJsonData } from '@grafana/data';
 
-export interface MyQuery extends DataQuery {
-  queryText?: string;
-  constant: number;
+export interface DeepQuery extends DataQuery {
+  limit?: number;
+  search: string;
+  serviceName?: string;
+  /**
+   * TraceQL query or trace ID
+   */
+  query: string;
+
+  queryType: DeepQueryType;
 }
 
-export const DEFAULT_QUERY: Partial<MyQuery> = {
-  constant: 6.5,
+export interface SearchQueryParams {
+  limit?: number;
+  tags?: string;
+  start?: number;
+  end?: number;
+}
+
+export type SnapshotSearchMetadata = {
+  snapshotID: string;
+  serviceName: string;
+  filePath: string;
+  lineNo: number;
+  startTimeUnixNano?: string;
+  durationNano?: string;
+};
+
+
+export const DEFAULT_QUERY: Partial<DeepQuery> = {
+
 };
 
 /**
@@ -22,3 +46,18 @@ export interface MyDataSourceOptions extends DataSourceJsonData {
 export interface MySecureJsonData {
   apiKey?: string;
 }
+
+export interface Snapshot {
+  ID: string
+  attributes: {key: string}[]
+}
+
+export interface SnapshotTableData {
+  [key: string]: string | number | boolean | undefined; // dynamic attribute name
+  snapshotID?: string;
+  startTime?: string;
+  name?: string;
+  durationNano?: string;
+}
+
+export type DeepQueryType = ('deepql' | 'search');

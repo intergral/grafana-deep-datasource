@@ -27,6 +27,10 @@ Grafana supports a wide range of data sources, including Prometheus, MySQL, and 
    mage debugger
    ```
 4. Connect Idea by running 'Docker Debug'
+5. You might need to ignore git error in the docker:
+   ```bash
+   git config --global --add safe.directory ${PWD}
+   ```
 ### Backend
 
 1. Update [Grafana plugin SDK for Go](https://grafana.com/docs/grafana/latest/developers/plugins/backend/grafana-plugin-sdk-for-go/) dependency to the latest minor version:
