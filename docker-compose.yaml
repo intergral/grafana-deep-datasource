@@ -1,0 +1,20 @@
+version: '3.0'
+
+services:
+  grafana:
+    container_name: 'deep-datasource'
+    build:
+      context: ./.config
+      args:
+        grafana_version: ${GRAFANA_VERSION:-9.3.8}
+    ports:
+      - "3100:3000"
+      - "3222:3222"
+    cap_add:
+      - SYS_PTRACE
+    security_opt:
+      - seccomp:unconfined
+    volumes:
+      - ./:/root/dev
+      - ./dist:/var/lib/grafana/plugins/deep-datasource
+      - ./provisioning:/etc/grafana/provisioning
