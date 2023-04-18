@@ -9,6 +9,7 @@ Grafana supports a wide range of data sources, including Prometheus, MySQL, and 
 ## Getting started
 
 ### Backend Debug
+
 1. Run server
 
    ```bash
@@ -31,6 +32,7 @@ Grafana supports a wide range of data sources, including Prometheus, MySQL, and 
    ```bash
    git config --global --add safe.directory ${PWD}
    ```
+
 ### Backend
 
 1. Update [Grafana plugin SDK for Go](https://grafana.com/docs/grafana/latest/developers/plugins/backend/grafana-plugin-sdk-for-go/) dependency to the latest minor version:
@@ -51,6 +53,7 @@ Grafana supports a wide range of data sources, including Prometheus, MySQL, and 
    ```bash
    mage -l
    ```
+
 ### Frontend
 
 1. Install dependencies
@@ -76,7 +79,7 @@ Grafana supports a wide range of data sources, including Prometheus, MySQL, and 
    ```bash
    # Runs the tests and watches for changes, requires git init first
    yarn test
-   
+
    # Exits after running all the tests
    yarn test:ci
    ```
@@ -90,9 +93,9 @@ Grafana supports a wide range of data sources, including Prometheus, MySQL, and 
 6. Run the E2E tests (using Cypress)
 
    ```bash
-   # Spins up a Grafana instance first that we tests against 
+   # Spins up a Grafana instance first that we tests against
    yarn server
-   
+
    # Starts the tests
    yarn e2e
    ```
@@ -101,12 +104,11 @@ Grafana supports a wide range of data sources, including Prometheus, MySQL, and 
 
    ```bash
    yarn lint
-   
+
    # or
 
    yarn lint:fix
    ```
-
 
 # Distributing your plugin
 
@@ -146,7 +148,6 @@ To trigger the workflow we need to push a version tag to github. This can be ach
 
 1. Run `npm version <major|minor|patch>`
 2. Run `git push origin main --follow-tags`
-
 
 ## Learn more
 

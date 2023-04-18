@@ -28,10 +28,7 @@ export type SnapshotSearchMetadata = {
   durationNano?: string;
 };
 
-
-export const DEFAULT_QUERY: Partial<DeepQuery> = {
-
-};
+export const DEFAULT_QUERY: Partial<DeepQuery> = {};
 
 /**
  * These are options configured for each DataSource instance
@@ -48,8 +45,8 @@ export interface MySecureJsonData {
 }
 
 export interface Snapshot {
-  ID: string
-  attributes: {key: string}[]
+  ID: string;
+  attributes: Array<{ key: string }>;
 }
 
 export interface SnapshotTableData {
@@ -60,4 +57,4 @@ export interface SnapshotTableData {
   durationNano?: string;
 }
 
-export type DeepQueryType = ('deepql' | 'search');
+export type DeepQueryType = 'deepql' | 'search';

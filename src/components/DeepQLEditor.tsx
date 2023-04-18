@@ -12,14 +12,14 @@ import { CodeEditor, Monaco, monacoTypes, useTheme2 } from '@grafana/ui';
 
 import { CompletionProvider, CompletionType } from '../autocomplete';
 import { languageDefinition } from '../deepql';
-import {Props} from "./QueryEditor";
-import {defaults} from "lodash";
-import {DEFAULT_QUERY} from "../types";
-import {DeepDataSource} from "../DeepDataSource";
+import { Props } from './QueryEditor';
+import { defaults } from 'lodash';
+import { DEFAULT_QUERY } from '../types';
+import { DeepDataSource } from '../DeepDataSource';
 
 interface QLProps extends Props {
-  placeholder: string
-  readOnly: boolean
+  placeholder: string;
+  readOnly: boolean;
 }
 
 export function DeepQLEditor(props: QLProps) {
@@ -31,8 +31,8 @@ export function DeepQLEditor(props: QLProps) {
   const _query = defaults(query, DEFAULT_QUERY);
 
   const onQLChange = (val: string) => {
-    onChange({..._query, query: val})
-  }
+    onChange({ ..._query, query: val });
+  };
 
   return (
     <CodeEditor
@@ -166,7 +166,7 @@ function useAutocomplete(datasource: DeepDataSource) {
         }
       } catch (error) {
         if (error instanceof Error) {
-          console.log(error)
+          console.log(error);
           //dispatch(notifyApp(createErrorNotification('Error', error)));
         }
       }

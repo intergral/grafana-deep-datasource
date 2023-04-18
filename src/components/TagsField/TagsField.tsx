@@ -6,7 +6,7 @@ import { CodeEditor, Monaco, monacoTypes, useTheme2 } from '@grafana/ui';
 
 import { CompletionProvider } from './autocomplete';
 import { languageDefinition } from './syntax';
-import {DeepDataSource} from "../../DeepDataSource";
+import { DeepDataSource } from '../../DeepDataSource';
 
 interface Props {
   placeholder: string;
@@ -126,7 +126,7 @@ function useAutocomplete(datasource: DeepDataSource) {
         }
       } catch (error) {
         if (error instanceof Error) {
-          console.log(error)
+          console.log(error);
           // dispatch(notifyApp(createErrorNotification('Error', error)));
         }
       }

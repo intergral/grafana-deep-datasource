@@ -1,16 +1,14 @@
-import { css } from '@emotion/css';
-import React, { useCallback, useState, useEffect, useMemo } from 'react';
+import {css} from '@emotion/css';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
 
-import { GrafanaTheme2, SelectableValue, toOption } from '@grafana/data';
-import { FetchError, getTemplateSrv, isFetchError } from '@grafana/runtime';
-import { InlineFieldRow, InlineField, Input, Alert, useStyles2, fuzzyMatch, Select } from '@grafana/ui';
+import {GrafanaTheme2, SelectableValue, toOption} from '@grafana/data';
+import {FetchError, getTemplateSrv, isFetchError} from '@grafana/runtime';
+import {Alert, fuzzyMatch, InlineField, InlineFieldRow, Input, Select, useStyles2} from '@grafana/ui';
 
-
-import { TagsField } from './TagsField/TagsField';
-import {Props} from "./QueryEditor";
-import DeepLanguageProvider from "../DeepLanguageProvider";
-import {DEFAULT_LIMIT} from "../DeepDataSource";
-
+import {TagsField} from './TagsField/TagsField';
+import {Props} from './QueryEditor';
+import DeepLanguageProvider from '../DeepLanguageProvider';
+import {DEFAULT_LIMIT} from '../DeepDataSource';
 
 const NativeSearch = ({ datasource, query, onChange, onBlur, onRunQuery }: Props) => {
   const styles = useStyles2(getStyles);
@@ -33,13 +31,12 @@ const NativeSearch = ({ datasource, query, onChange, onBlur, onRunQuery }: Props
 
       try {
         const options = await languageProvider.getOptionsV1(lpName);
-        const filteredOptions = options.filter((item) => (item.value ? fuzzyMatch(item.value, query).found : false));
-        return filteredOptions;
+        return options.filter((item) => (item.value ? fuzzyMatch(item.value, query).found : false));
       } catch (error) {
         if (isFetchError(error) && error?.status === 404) {
           setError(error);
         } else if (error instanceof Error) {
-          console.log(error)
+          console.log(error);
           //dispatch(notifyApp(createErrorNotification('Error', error)));
         }
         return [];
@@ -63,7 +60,7 @@ const NativeSearch = ({ datasource, query, onChange, onBlur, onRunQuery }: Props
         if (isFetchError(error) && error?.status === 404) {
           setError(error);
         } else if (error instanceof Error) {
-          console.log(error)
+          console.log(error);
           // dispatch(notifyApp(createErrorNotification('Error', error)));
         }
       }
