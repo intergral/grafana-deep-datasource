@@ -60,10 +60,6 @@ export interface MySecureJsonData {
   apiKey?: string;
 }
 
-export interface Snapshot {
-  ID: string;
-  attributes: Array<{ key: string }>;
-}
 
 export interface SnapshotTableData {
   [key: string]: string | number | boolean | undefined; // dynamic attribute name

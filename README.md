@@ -19,7 +19,7 @@ Grafana supports a wide range of data sources, including Prometheus, MySQL, and 
 2. Exec to container
 
    ```bash
-   docker exec -it deep-datasource bash
+   docker exec -it grafana-deep-datasource bash
    ```
 
 3. Start Delve

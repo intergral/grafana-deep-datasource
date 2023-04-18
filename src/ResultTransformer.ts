@@ -14,12 +14,19 @@
  *    limitations under the License.
  */
 
-import { MyDataSourceOptions, Snapshot, SnapshotSearchMetadata, SnapshotTableData } from './types';
-import { DataFrame, DataSourceInstanceSettings, dateTimeFormat, FieldType, MutableDataFrame } from '@grafana/data';
+import {MyDataSourceOptions, SnapshotSearchMetadata, SnapshotTableData} from './types';
+import {
+  DataFrame,
+  DataQueryResponse,
+  DataSourceInstanceSettings,
+  dateTimeFormat,
+  FieldType,
+  MutableDataFrame
+} from '@grafana/data';
 
 export function createTableFrameFromTraceQlQuery(
-  data: SnapshotSearchMetadata[],
-  instanceSettings: DataSourceInstanceSettings
+    data: SnapshotSearchMetadata[],
+    instanceSettings: DataSourceInstanceSettings
 ): DataFrame[] {
   const frame = new MutableDataFrame({
     fields: [
@@ -112,7 +119,7 @@ export function createTableFrameFromSearch(
           displayNameFromDS: 'Snapshot ID',
           links: [
             {
-              title: 'Trace: ${__value.raw}',
+              title: 'Snapshot: ${__value.raw}',
               url: '',
               internal: {
                 datasourceUid: instanceSettings.uid,
@@ -126,9 +133,9 @@ export function createTableFrameFromSearch(
           ],
         },
       },
-      { name: 'traceName', type: FieldType.string, config: { displayNameFromDS: 'Snapshot Location' } },
-      { name: 'startTime', type: FieldType.string, config: { displayNameFromDS: 'Start time' } },
-      { name: 'duration', type: FieldType.number, config: { displayNameFromDS: 'Duration', unit: 'ns' } },
+      {name: 'location', type: FieldType.string, config: {displayNameFromDS: 'Snapshot Location'}},
+      {name: 'startTime', type: FieldType.string, config: {displayNameFromDS: 'Start time'}},
+      {name: 'duration', type: FieldType.number, config: {displayNameFromDS: 'Duration', unit: 'ns'}},
     ],
     meta: {
       preferredVisualisationType: 'table',
@@ -150,15 +157,15 @@ export function createTableFrameFromSearch(
 }
 
 function transformToTraceData(data: SnapshotSearchMetadata): SnapshotTableData {
-  let traceName = '';
+  let location = '';
   if (data.serviceName) {
-    traceName += data.serviceName + ' ';
+    location += data.serviceName + ' ';
   }
   if (data.filePath) {
-    traceName += data.filePath;
+    location += data.filePath;
   }
   if (data.lineNo) {
-    traceName += ':' + data.lineNo;
+    location += ':' + data.lineNo;
   }
 
   const traceStartTime = parseInt(data.startTimeUnixNano!, 10) / 1000000;
@@ -169,50 +176,10 @@ function transformToTraceData(data: SnapshotSearchMetadata): SnapshotTableData {
     snapshotID: data.snapshotID,
     startTime,
     duration: data.durationNano?.toString(),
-    traceName,
+    location,
   };
 }
 
-export function createSingleResponse(
-  data: Snapshot,
-  instanceSettings: DataSourceInstanceSettings<MyDataSourceOptions>
-) {
-  const frame = new MutableDataFrame({
-    fields: [
-      {
-        name: 'snapshotID',
-        type: FieldType.string,
-        config: {
-          unit: 'string',
-          displayNameFromDS: 'Snapshot ID',
-          links: [
-            {
-              title: 'Trace: ${__value.raw}',
-              url: '',
-              internal: {
-                datasourceUid: instanceSettings.uid,
-                datasourceName: instanceSettings.name,
-                query: {
-                  query: '${__value.raw}',
-                  queryType: 'deepql',
-                },
-              },
-            },
-          ],
-        },
-      },
-      { name: 'traceName', type: FieldType.string, config: { displayNameFromDS: 'Snapshot Location' } },
-      { name: 'startTime', type: FieldType.string, config: { displayNameFromDS: 'Start time' } },
-      { name: 'duration', type: FieldType.number, config: { displayNameFromDS: 'Duration', unit: 'ns' } },
-    ],
-    meta: {
-      json: true,
-    },
-  });
-
-  frame.add({
-    snapshotID: data.ID,
-  });
-
-  return frame;
+export function transformSnapshot(response: DataQueryResponse): DataQueryResponse {
+  return response
 }

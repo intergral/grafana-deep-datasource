@@ -18,16 +18,20 @@ package plugin
 
 import (
 	"context"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"github.com/grafana/grafana-plugin-sdk-go/backend/httpclient"
-	"io"
-	"net/http"
-	"time"
-
+	kitlog "github.com/go-kit/log"
+	"github.com/golang/protobuf/proto"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
+	"github.com/grafana/grafana-plugin-sdk-go/backend/httpclient"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/instancemgmt"
 	"github.com/grafana/grafana-plugin-sdk-go/data"
+	deep_tp "github.com/intergral/go-deep-proto/tracepoint/v1"
+	"io"
+	"net/http"
+	"os"
+	"strings"
 )
 
 // Make sure DeepDatasource implements required interfaces. This is important to do
@@ -47,8 +51,10 @@ func NewDeepDatasource(settings backend.DataSourceInstanceSettings) (instancemgm
 	if err != nil {
 		return nil, err
 	}
+	writer := kitlog.NewSyncWriter(os.Stderr)
 	return &DeepDatasource{
 		client: client,
+		log:    kitlog.NewLogfmtLogger(writer),
 	}, nil
 }
 
@@ -68,6 +74,7 @@ func getMiddlewares(settings backend.DataSourceInstanceSettings) (httpclient.Opt
 // its health and has streaming skills.
 type DeepDatasource struct {
 	client *http.Client
+	log    kitlog.Logger
 }
 
 // Dispose here tells plugin SDK that plugin wants to clean up resources when a new instance
@@ -101,10 +108,10 @@ type queryModel struct {
 	Search      string `json:"search"`
 	ServiceName string `json:"serviceName"`
 	Limit       uint   `json:"limit"`
+	Query       string `json:"query"`
 }
 
 func (d *DeepDatasource) query(_ context.Context, pCtx backend.PluginContext, query backend.DataQuery) backend.DataResponse {
-	var response backend.DataResponse
 
 	// Unmarshal the JSON into our queryModel.
 	var qm queryModel
@@ -114,21 +121,95 @@ func (d *DeepDatasource) query(_ context.Context, pCtx backend.PluginContext, qu
 		return backend.ErrDataResponse(backend.StatusBadRequest, fmt.Sprintf("json unmarshal: %v", err.Error()))
 	}
 
-	// create data frame response.
-	// For an overview on data frames and how grafana handles them:
-	// https://grafana.com/docs/grafana/latest/developers/plugins/data-frames/
-	frame := data.NewFrame("response")
+	url := fmt.Sprintf("%v/api/snapshots/%v", pCtx.DataSourceInstanceSettings.URL, qm.Query)
 
-	// add fields.
-	frame.Fields = append(frame.Fields,
-		data.NewField("time", nil, []time.Time{query.TimeRange.From, query.TimeRange.To}),
-		data.NewField("values", nil, []int64{10, 20}),
+	request, err := http.NewRequest(http.MethodGet, url, nil)
+	if err != nil {
+		return backend.ErrDataResponse(backend.StatusBadRequest, fmt.Sprintf("cannot build request: %v", err.Error()))
+	}
+	request.Header.Set("Accept", "application/protobuf")
+
+	response, err := d.client.Do(request)
+	if err != nil {
+		return backend.ErrDataResponse(backend.StatusBadRequest, fmt.Sprintf("request failed: %v", err.Error()))
+	}
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			_ = d.log.Log("msg", "failed to close response body", "err", err)
+		}
+	}(response.Body)
+
+	all, err := io.ReadAll(response.Body)
+	if err != nil {
+		return backend.ErrDataResponse(backend.StatusBadRequest, fmt.Sprintf("read failed: %v", err.Error()))
+	}
+
+	var snap deep_tp.Snapshot
+	err = proto.Unmarshal(all, &snap)
+	if err != nil {
+		return backend.ErrDataResponse(backend.StatusBadRequest, fmt.Sprintf("response failed: %v", err.Error()))
+	}
+
+	frame, err := snapshotToFrame(&snap)
+	if err != nil {
+		return backend.ErrDataResponse(backend.StatusBadRequest, fmt.Sprintf("convertion failed: %v", err.Error()))
+	}
+
+	frame.RefID = query.RefID
+	return backend.DataResponse{
+		Frames: []*data.Frame{frame},
+	}
+}
+
+func snapshotToFrame(snap *deep_tp.Snapshot) (*data.Frame, error) {
+	frame := &data.Frame{
+		Name: "Snapshot",
+		Fields: []*data.Field{
+			data.NewField("snapshotID", nil, []string{}),
+			data.NewField("tracepoint", nil, []json.RawMessage{}),
+			data.NewField("varLookup", nil, []json.RawMessage{}),
+			data.NewField("tsNanos", nil, []uint64{}),
+			data.NewField("Frames", nil, []json.RawMessage{}),
+			data.NewField("Watches", nil, []json.RawMessage{}),
+			data.NewField("Attributes", nil, []json.RawMessage{}),
+			data.NewField("DurationNanos", nil, []uint64{}),
+			data.NewField("Resource", nil, []json.RawMessage{}),
+		},
+		Meta: &data.FrameMeta{
+			PreferredVisualization: "snapshot",
+		},
+	}
+
+	hexString := SnapshotIDToHexString(snap.ID)
+	tpJson, _ := json.Marshal(snap.Tracepoint)
+	lookupJson, _ := json.Marshal(snap.VarLookup)
+	framesJson, _ := json.Marshal(snap.Frames)
+	watchesJson, _ := json.Marshal(snap.Watches)
+	attributesJson, _ := json.Marshal(snap.Attributes)
+	resourceJson, _ := json.Marshal(snap.Resource)
+
+	frame.AppendRow(
+		hexString,
+		json.RawMessage(tpJson),
+		json.RawMessage(lookupJson),
+		snap.TsNanos,
+		json.RawMessage(framesJson),
+		json.RawMessage(watchesJson),
+		json.RawMessage(attributesJson),
+		snap.DurationNanos,
+		json.RawMessage(resourceJson),
 	)
 
-	// add the frames to the response.
-	response.Frames = append(response.Frames, frame)
+	return frame, nil
+}
 
-	return response
+// SnapshotIDToHexString converts a trace ID to its string representation and removes any leading zeros.
+func SnapshotIDToHexString(byteID []byte) string {
+	id := hex.EncodeToString(byteID)
+	// remove leading zeros
+	id = strings.TrimLeft(id, "0")
+	return id
 }
 
 // CheckHealth handles health checks sent from Grafana to the plugin.

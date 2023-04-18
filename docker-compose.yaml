@@ -2,7 +2,7 @@ version: '3.0'
 
 services:
   grafana:
-    container_name: 'deep-datasource'
+    container_name: 'grafana-deep-datasource'
     build:
       context: ./.config
       args:

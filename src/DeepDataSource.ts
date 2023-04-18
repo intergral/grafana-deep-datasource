@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-import { CoreApp, DataQueryRequest, DataQueryResponse, DataSourceInstanceSettings, ScopedVars } from '@grafana/data';
+import {CoreApp, DataQueryRequest, DataQueryResponse, DataSourceInstanceSettings, ScopedVars} from '@grafana/data';
 import {
   BackendSrvRequest,
   config,
@@ -25,12 +25,12 @@ import {
   TemplateSrv,
 } from '@grafana/runtime';
 
-import { DeepQuery, DEFAULT_QUERY, MyDataSourceOptions, SearchQueryParams } from './types';
+import {DeepQuery, DEFAULT_QUERY, MyDataSourceOptions, SearchQueryParams} from './types';
 import DeepLanguageProvider from './DeepLanguageProvider';
-import { catchError, lastValueFrom, map, merge, Observable, of } from 'rxjs';
-import { serializeParams } from 'Utils';
-import { groupBy, identity, pick, pickBy } from 'lodash';
-import { createSingleResponse, createTableFrameFromSearch, createTableFrameFromTraceQlQuery } from 'ResultTransformer';
+import {catchError, lastValueFrom, map, merge, Observable, of} from 'rxjs';
+import {serializeParams} from 'Utils';
+import {groupBy, identity, pick, pickBy} from 'lodash';
+import {createTableFrameFromSearch, createTableFrameFromTraceQlQuery, transformSnapshot} from 'ResultTransformer';
 
 export const DEFAULT_LIMIT = 20;
 
@@ -38,8 +38,8 @@ export class DeepDataSource extends DataSourceWithBackend<DeepQuery, MyDataSourc
   languageProvider: DeepLanguageProvider;
 
   constructor(
-    private instanceSettings: DataSourceInstanceSettings<MyDataSourceOptions>,
-    private readonly templateSrv: TemplateSrv = getTemplateSrv()
+      private instanceSettings: DataSourceInstanceSettings<MyDataSourceOptions>,
+      private readonly templateSrv: TemplateSrv = getTemplateSrv()
   ) {
     super(instanceSettings);
     this.languageProvider = new DeepLanguageProvider(this);
@@ -103,18 +103,7 @@ export class DeepDataSource extends DataSourceWithBackend<DeepQuery, MyDataSourc
             hasQuery: queryValue !== '',
           });
 
-          queries.push(
-            this._request(`/api/snapshots/${appliedQuery.query}`).pipe(
-              map((response) => {
-                return {
-                  data: [createSingleResponse(response.data, this.instanceSettings)],
-                };
-              }),
-              catchError((error) => {
-                return of({ error: { message: error.data.message }, data: [] });
-              })
-            )
-          );
+          queries.push(this.handleSingleRequest(options, appliedQuery));
         } else {
           reportInteraction('grafana_traces_deepql_queried', {
             datasourceType: 'deep',
@@ -193,14 +182,31 @@ export class DeepDataSource extends DataSourceWithBackend<DeepQuery, MyDataSourc
   }
 
   async metadataRequest(url: string, params = {}) {
-    return await lastValueFrom(this._request(url, params, { method: 'GET', hideFromInspector: true }));
+    return await lastValueFrom(this._request(url, params, {method: 'GET', hideFromInspector: true}));
   }
 
   private _request(apiUrl: string, data?: any, options?: Partial<BackendSrvRequest>): Observable<Record<string, any>> {
     const params = data ? serializeParams(data) : '';
     const url = `${this.instanceSettings.url}${apiUrl}${params.length ? `?${params}` : ''}`;
-    const req = { ...options, url };
+    const req = {...options, url};
 
     return getBackendSrv().fetch(req);
+  }
+
+  private handleSingleRequest(options: DataQueryRequest<DeepQuery>, appliedQuery: DeepQuery) {
+
+    const req: DataQueryRequest<DeepQuery> = {
+      ...options,
+      targets: [appliedQuery]
+    }
+
+    return super.query(req).pipe(
+        map((response) => {
+          if (response.error) {
+            return response;
+          }
+          return transformSnapshot(response);
+        })
+    );
   }
 }
