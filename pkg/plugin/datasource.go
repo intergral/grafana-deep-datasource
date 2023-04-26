@@ -32,7 +32,6 @@ import (
 	"io"
 	"net/http"
 	"os"
-	"strconv"
 	"strings"
 )
 
@@ -181,7 +180,7 @@ func snapshotToFrame(snap *deep_tp.Snapshot) (*data.Frame, error) {
 		Meta: &data.FrameMeta{
 			PreferredVisualization: "plugin",
 			Custom: map[string]interface{}{
-				"pluginID": "intergralgmbh-grafanadeep-panel",
+				"pluginID": "intergral-deep-panel",
 				"title":    fmt.Sprintf("Snapshot: %v:%v", snap.Tracepoint.Path, snap.Tracepoint.LineNumber),
 			},
 		},
@@ -210,31 +209,50 @@ func snapshotToFrame(snap *deep_tp.Snapshot) (*data.Frame, error) {
 	return frame, nil
 }
 
-func keyValuesToMap(attributes []*v1.KeyValue) map[string]string {
-	var kvMap = make(map[string]string, len(attributes))
+func keyValuesToMap(attributes []*v1.KeyValue) map[string]interface{} {
+	var kvMap = make(map[string]interface{}, len(attributes))
 
 	for _, attribute := range attributes {
 		key := attribute.Key
-		var value string
-		switch v := attribute.GetValue().Value.(type) {
-		case *v1.AnyValue_StringValue:
-			value = v.StringValue
-		case *v1.AnyValue_IntValue:
-			value = strconv.FormatInt(v.IntValue, 10)
-		case *v1.AnyValue_DoubleValue:
-			value = fmt.Sprintf("%f", v.DoubleValue)
-		case *v1.AnyValue_BoolValue:
-			value = strconv.FormatBool(v.BoolValue)
-		case *v1.AnyValue_ArrayValue:
-		case *v1.AnyValue_KvlistValue:
-			val, _ := json.Marshal(attribute.Value) // deliberately marshalling a.Value because of AnyValue logic
-			value = string(val)
-		}
+		value := anyValueToString(attribute.Value)
 
 		kvMap[key] = value
 	}
 
 	return kvMap
+}
+
+func anyValueToString(val *v1.AnyValue) interface{} {
+
+	var value interface{}
+	switch v := val.Value.(type) {
+	case *v1.AnyValue_StringValue:
+		value = v.StringValue
+	case *v1.AnyValue_IntValue:
+		value = v.IntValue
+	case *v1.AnyValue_DoubleValue:
+		value = v.DoubleValue
+	case *v1.AnyValue_BoolValue:
+		value = v.BoolValue
+	case *v1.AnyValue_BytesValue:
+		value = "Unsupported type: bytes"
+	case *v1.AnyValue_ArrayValue:
+		values := v.ArrayValue.Values
+		strArr := make([]interface{}, len(values))
+		for i, anyValue := range values {
+			toString := anyValueToString(anyValue)
+			strArr[i] = toString
+		}
+		bytes, _ := json.Marshal(strArr)
+		value = string(bytes)
+	case *v1.AnyValue_KvlistValue:
+		kvlistValue := v.KvlistValue
+		toMap := keyValuesToMap(kvlistValue.Values)
+		val, _ := json.Marshal(toMap)
+		value = string(val)
+	}
+
+	return value
 }
 
 // SnapshotIDToHexString converts a trace ID to its string representation and removes any leading zeros.
