@@ -14,7 +14,7 @@ RUN curl -L https://golang.org/dl/go1.18.linux-amd64.tar.gz > go1.18.linux-amd64
 RUN rm -rf /usr/local/go && \
     tar -C /usr/local -xzf go1.18.linux-amd64.tar.gz
 
-RUN touch README; printf "~~~~~~ START THE DLV SERVER WITH THIS COMMAND BEFORE RUNNING IDE DEBUGGER ~~~~~~ \r\ndlv attach --headless --listen=:2345 PID\r\n\r\n" >> README
+RUN touch README; printf "~~~~~~ START THE DLV SERVER WITH THIS COMMAND BEFORE RUNNING IDE DEBUGGER ~~~~~~ \r\nmage debugger\r\n\r\n" >> README
 
 RUN echo "export PATH=$PATH:/usr/local/go/bin:~/go/bin" >> ~/.bashrc
 RUN echo "cat ~/README" >> ~/.bashrc
@@ -35,4 +35,6 @@ ENV GF_DEFAULT_APP_MODE "development"
 
 # Inject livereload script into grafana index.html
 USER root
+WORKDIR /root/dev
+RUN git config --global --add safe.directory /root/dev
 RUN sed -i 's/<\/body><\/html>/<script src=\"http:\/\/localhost:35729\/livereload.js\"><\/script><\/body><\/html>/g' /usr/share/grafana/public/views/index.html

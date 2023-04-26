@@ -27,10 +27,12 @@ import (
 	"github.com/grafana/grafana-plugin-sdk-go/backend/httpclient"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/instancemgmt"
 	"github.com/grafana/grafana-plugin-sdk-go/data"
+	"github.com/intergral/go-deep-proto/common/v1"
 	deep_tp "github.com/intergral/go-deep-proto/tracepoint/v1"
 	"io"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 )
 
@@ -177,7 +179,11 @@ func snapshotToFrame(snap *deep_tp.Snapshot) (*data.Frame, error) {
 			data.NewField("Resource", nil, []json.RawMessage{}),
 		},
 		Meta: &data.FrameMeta{
-			PreferredVisualization: "snapshot",
+			PreferredVisualization: "plugin",
+			Custom: map[string]interface{}{
+				"pluginID": "intergralgmbh-grafanadeep-panel",
+				"title":    fmt.Sprintf("Snapshot: %v:%v", snap.Tracepoint.Path, snap.Tracepoint.LineNumber),
+			},
 		},
 	}
 
@@ -186,8 +192,8 @@ func snapshotToFrame(snap *deep_tp.Snapshot) (*data.Frame, error) {
 	lookupJson, _ := json.Marshal(snap.VarLookup)
 	framesJson, _ := json.Marshal(snap.Frames)
 	watchesJson, _ := json.Marshal(snap.Watches)
-	attributesJson, _ := json.Marshal(snap.Attributes)
-	resourceJson, _ := json.Marshal(snap.Resource)
+	attributesJson, _ := json.Marshal(keyValuesToMap(snap.Attributes))
+	resourceJson, _ := json.Marshal(keyValuesToMap(snap.Resource))
 
 	frame.AppendRow(
 		hexString,
@@ -202,6 +208,33 @@ func snapshotToFrame(snap *deep_tp.Snapshot) (*data.Frame, error) {
 	)
 
 	return frame, nil
+}
+
+func keyValuesToMap(attributes []*v1.KeyValue) map[string]string {
+	var kvMap = make(map[string]string, len(attributes))
+
+	for _, attribute := range attributes {
+		key := attribute.Key
+		var value string
+		switch v := attribute.GetValue().Value.(type) {
+		case *v1.AnyValue_StringValue:
+			value = v.StringValue
+		case *v1.AnyValue_IntValue:
+			value = strconv.FormatInt(v.IntValue, 10)
+		case *v1.AnyValue_DoubleValue:
+			value = fmt.Sprintf("%f", v.DoubleValue)
+		case *v1.AnyValue_BoolValue:
+			value = strconv.FormatBool(v.BoolValue)
+		case *v1.AnyValue_ArrayValue:
+		case *v1.AnyValue_KvlistValue:
+			val, _ := json.Marshal(attribute.Value) // deliberately marshalling a.Value because of AnyValue logic
+			value = string(val)
+		}
+
+		kvMap[key] = value
+	}
+
+	return kvMap
 }
 
 // SnapshotIDToHexString converts a trace ID to its string representation and removes any leading zeros.
@@ -244,7 +277,9 @@ func (d *DeepDatasource) CheckHealth(_ context.Context, req *backend.CheckHealth
 		}, nil
 	}
 
-	defer response.Body.Close()
+	defer func(Body io.ReadCloser) {
+		_ = Body.Close()
+	}(response.Body)
 	body, err := io.ReadAll(response.Body)
 	if err != nil {
 		return &backend.CheckHealthResult{
