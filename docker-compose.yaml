@@ -6,15 +6,16 @@ services:
     build:
       context: ./.config
       args:
-        grafana_version: ${GRAFANA_VERSION:-9.3.8}
+        grafana_version: ${GRAFANA_VERSION:-dev}
+        grafana_image: ${GRAFANA_IMAGE:-grafana-oss}
     ports:
-      - '3100:3000'
-      - '3222:3222'
+      - '3000:3000' # this needs to be 3000 for e2e tests
+      - '3222:3222' # this is for delve debugger
     cap_add:
       - SYS_PTRACE
     security_opt:
       - seccomp:unconfined
     volumes:
       - ./:/root/dev
-      - ./dist:/var/lib/grafana/plugins/deep-datasource
+      - ./dist:/var/lib/grafana/plugins/grafana-deep-datasource
       - ./provisioning:/etc/grafana/provisioning
