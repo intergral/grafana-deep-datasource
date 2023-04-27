@@ -14,19 +14,19 @@
  *    limitations under the License.
  */
 
-import {MyDataSourceOptions, SnapshotSearchMetadata, SnapshotTableData} from './types';
+import { DeepDatasourceOptions, SnapshotSearchMetadata, SnapshotTableData } from './types';
 import {
   DataFrame,
   DataQueryResponse,
   DataSourceInstanceSettings,
   dateTimeFormat,
   FieldType,
-  MutableDataFrame
+  MutableDataFrame,
 } from '@grafana/data';
 
 export function createTableFrameFromTraceQlQuery(
-    data: SnapshotSearchMetadata[],
-    instanceSettings: DataSourceInstanceSettings
+  data: SnapshotSearchMetadata[],
+  instanceSettings: DataSourceInstanceSettings
 ): DataFrame[] {
   const frame = new MutableDataFrame({
     fields: [
@@ -107,7 +107,7 @@ export function createTableFrameFromTraceQlQuery(
 
 export function createTableFrameFromSearch(
   data: SnapshotSearchMetadata[],
-  instanceSettings: DataSourceInstanceSettings<MyDataSourceOptions>
+  instanceSettings: DataSourceInstanceSettings<DeepDatasourceOptions>
 ) {
   const frame = new MutableDataFrame({
     fields: [
@@ -126,16 +126,16 @@ export function createTableFrameFromSearch(
                 datasourceName: instanceSettings.name,
                 query: {
                   query: '${__value.raw}',
-                  queryType: 'deepql',
+                  queryType: 'byid',
                 },
               },
             },
           ],
         },
       },
-      {name: 'location', type: FieldType.string, config: {displayNameFromDS: 'Snapshot Location'}},
-      {name: 'startTime', type: FieldType.string, config: {displayNameFromDS: 'Start time'}},
-      {name: 'duration', type: FieldType.number, config: {displayNameFromDS: 'Duration', unit: 'ns'}},
+      { name: 'location', type: FieldType.string, config: { displayNameFromDS: 'Snapshot Location' } },
+      { name: 'startTime', type: FieldType.string, config: { displayNameFromDS: 'Start time' } },
+      { name: 'duration', type: FieldType.number, config: { displayNameFromDS: 'Duration', unit: 'ns' } },
     ],
     meta: {
       preferredVisualisationType: 'table',
@@ -181,5 +181,5 @@ function transformToTraceData(data: SnapshotSearchMetadata): SnapshotTableData {
 }
 
 export function transformSnapshot(response: DataQueryResponse): DataQueryResponse {
-  return response
+  return response;
 }

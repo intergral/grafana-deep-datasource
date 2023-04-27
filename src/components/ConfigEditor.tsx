@@ -17,19 +17,25 @@
 import React from 'react';
 import { DataSourceHttpSettings } from '@grafana/ui';
 import { DataSourcePluginOptionsEditorProps } from '@grafana/data';
-import { MyDataSourceOptions } from '../types';
+import { DeepDatasourceOptions } from '../types';
+import { ExperimentalSettings } from './config/ExperimentalConfig';
 
-interface Props extends DataSourcePluginOptionsEditorProps<MyDataSourceOptions> {}
+export interface Props extends DataSourcePluginOptionsEditorProps<DeepDatasourceOptions> {}
 
 export function ConfigEditor({ onOptionsChange, options }: Props) {
   return (
-    <div className="gf-form-group">
-      <DataSourceHttpSettings
-        defaultUrl="http://deep"
-        dataSourceConfig={options}
-        showAccessOptions={false}
-        onChange={onOptionsChange}
-      />
-    </div>
+    <>
+      <div className="gf-form-group">
+        <DataSourceHttpSettings
+          defaultUrl="http://deep"
+          dataSourceConfig={options}
+          showAccessOptions={false}
+          onChange={onOptionsChange}
+        />
+      </div>
+      <div className="gf-form-group">
+        <ExperimentalSettings options={options} onOptionsChange={onOptionsChange} />
+      </div>
+    </>
   );
 }

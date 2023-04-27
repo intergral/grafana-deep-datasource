@@ -49,8 +49,8 @@ export const DEFAULT_QUERY: Partial<DeepQuery> = {};
 /**
  * These are options configured for each DataSource instance
  */
-export interface MyDataSourceOptions extends DataSourceJsonData {
-  path?: string;
+export interface DeepDatasourceOptions extends DataSourceJsonData {
+  experimental: { deepql: boolean };
 }
 
 /**
@@ -60,7 +60,6 @@ export interface MySecureJsonData {
   apiKey?: string;
 }
 
-
 export interface SnapshotTableData {
   [key: string]: string | number | boolean | undefined; // dynamic attribute name
   snapshotID?: string;
@@ -69,4 +68,4 @@ export interface SnapshotTableData {
   durationNano?: string;
 }
 
-export type DeepQueryType = 'deepql' | 'search';
+export type DeepQueryType = 'deepql' | 'search' | 'byid';

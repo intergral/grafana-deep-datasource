@@ -14,17 +14,17 @@
  *    limitations under the License.
  */
 
-import {css} from '@emotion/css';
-import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import { css } from '@emotion/css';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
-import {GrafanaTheme2, SelectableValue, toOption} from '@grafana/data';
-import {FetchError, getTemplateSrv, isFetchError} from '@grafana/runtime';
-import {Alert, fuzzyMatch, InlineField, InlineFieldRow, Input, Select, useStyles2} from '@grafana/ui';
+import { GrafanaTheme2, SelectableValue, toOption } from '@grafana/data';
+import { FetchError, getTemplateSrv, isFetchError } from '@grafana/runtime';
+import { Alert, fuzzyMatch, InlineField, InlineFieldRow, Input, Select, useStyles2 } from '@grafana/ui';
 
-import {TagsField} from './TagsField/TagsField';
-import {Props} from './QueryEditor';
+import { TagsField } from './TagsField/TagsField';
+import { Props } from './QueryEditor';
 import DeepLanguageProvider from '../DeepLanguageProvider';
-import {DEFAULT_LIMIT} from '../DeepDataSource';
+import { DEFAULT_LIMIT } from '../DeepDataSource';
 
 const NativeSearch = ({ datasource, query, onChange, onBlur, onRunQuery }: Props) => {
   const styles = useStyles2(getStyles);
@@ -130,7 +130,7 @@ const NativeSearch = ({ datasource, query, onChange, onBlur, onRunQuery }: Props
         <InlineFieldRow>
           <InlineField label="Tags" labelWidth={14} grow tooltip="Values should be in logfmt.">
             <TagsField
-              placeholder="http.status_code=200 error=true"
+              placeholder="path=/some/file.py error=true"
               value={query.search || ''}
               onChange={handleOnChange}
               onBlur={onBlur}

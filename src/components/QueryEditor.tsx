@@ -19,24 +19,27 @@ import { InlineField, RadioButtonGroup, InlineFieldRow } from '@grafana/ui';
 import { QueryEditorProps, SelectableValue } from '@grafana/data';
 import { DeepDataSource } from '../DeepDataSource';
 import { DeepQLSearch } from './DeepQLSearch';
-import { DeepQueryType, MyDataSourceOptions, DeepQuery } from '../types';
+import { DeepQueryType, DeepDatasourceOptions, DeepQuery } from '../types';
 import { config, reportInteraction } from '@grafana/runtime';
 import NativeSearch from './NativeSearch';
+import { FindByIDSearch } from './FindByIDSearch';
 
-export type Props = QueryEditorProps<DeepDataSource, DeepQuery, MyDataSourceOptions>;
+export type Props = QueryEditorProps<DeepDataSource, DeepQuery, DeepDatasourceOptions>;
 
 export function QueryEditor({ query, onChange, onRunQuery, app, datasource, onBlur }: Props) {
   let queryTypeOptions: Array<SelectableValue<DeepQueryType>> = [
-    { value: 'deepql', label: 'DeepQL' },
+    { value: 'byid', label: 'Find ID' },
     { value: 'search', label: 'Search' },
   ];
 
-  function onClearResults() {
-    console.log('onClearResults');
+  if (datasource.getDatasourceOptions().experimental.deepql) {
+    queryTypeOptions.push({ value: 'deepql', label: 'DeepQL' });
   }
 
+  function onClearResults() {}
+
   if (!query.queryType) {
-    query.queryType = 'deepql';
+    query.queryType = 'search';
   }
 
   return (
@@ -77,6 +80,15 @@ export function QueryEditor({ query, onChange, onRunQuery, app, datasource, onBl
       )}
       {query.queryType === 'deepql' && (
         <DeepQLSearch
+          datasource={datasource}
+          query={query}
+          onChange={onChange}
+          onBlur={onBlur}
+          onRunQuery={onRunQuery}
+        />
+      )}
+      {query.queryType === 'byid' && (
+        <FindByIDSearch
           datasource={datasource}
           query={query}
           onChange={onChange}

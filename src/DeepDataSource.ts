@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-import {CoreApp, DataQueryRequest, DataQueryResponse, DataSourceInstanceSettings, ScopedVars} from '@grafana/data';
+import { CoreApp, DataQueryRequest, DataQueryResponse, DataSourceInstanceSettings, ScopedVars } from '@grafana/data';
 import {
   BackendSrvRequest,
   config,
@@ -25,24 +25,28 @@ import {
   TemplateSrv,
 } from '@grafana/runtime';
 
-import {DeepQuery, DEFAULT_QUERY, MyDataSourceOptions, SearchQueryParams} from './types';
+import { DeepQuery, DEFAULT_QUERY, DeepDatasourceOptions, SearchQueryParams } from './types';
 import DeepLanguageProvider from './DeepLanguageProvider';
-import {catchError, lastValueFrom, map, merge, Observable, of} from 'rxjs';
-import {serializeParams} from 'Utils';
-import {groupBy, identity, pick, pickBy} from 'lodash';
-import {createTableFrameFromSearch, createTableFrameFromTraceQlQuery, transformSnapshot} from 'ResultTransformer';
+import { catchError, lastValueFrom, map, merge, Observable, of } from 'rxjs';
+import { serializeParams } from 'Utils';
+import { groupBy, identity, pick, pickBy } from 'lodash';
+import { createTableFrameFromSearch, createTableFrameFromTraceQlQuery, transformSnapshot } from 'ResultTransformer';
 
 export const DEFAULT_LIMIT = 20;
 
-export class DeepDataSource extends DataSourceWithBackend<DeepQuery, MyDataSourceOptions> {
+export class DeepDataSource extends DataSourceWithBackend<DeepQuery, DeepDatasourceOptions> {
   languageProvider: DeepLanguageProvider;
 
   constructor(
-      private instanceSettings: DataSourceInstanceSettings<MyDataSourceOptions>,
-      private readonly templateSrv: TemplateSrv = getTemplateSrv()
+    private instanceSettings: DataSourceInstanceSettings<DeepDatasourceOptions>,
+    private readonly templateSrv: TemplateSrv = getTemplateSrv()
   ) {
     super(instanceSettings);
     this.languageProvider = new DeepLanguageProvider(this);
+  }
+
+  getDatasourceOptions(): DeepDatasourceOptions {
+    return this.instanceSettings.jsonData;
   }
 
   getDefaultQuery(_: CoreApp): Partial<DeepQuery> {
@@ -88,6 +92,27 @@ export class DeepDataSource extends DataSourceWithBackend<DeepQuery, MyDataSourc
       }
     }
 
+    if (targets.byid?.length) {
+      try {
+        const appliedQuery = this.applyVariables(targets.byid[0], options.scopedVars);
+        const queryValue = appliedQuery?.query || '';
+        // Check whether this is a snapshot ID or deepQL query by checking if it only contains hex characters
+        // There's only hex characters so let's assume that this is a trace ID
+        reportInteraction('grafana_traces_snapshotID_queried', {
+          datasourceType: 'deep',
+          app: options.app ?? '',
+          grafana_version: config.buildInfo.version,
+          hasQuery: queryValue !== '',
+        });
+
+        queries.push(this.handleSingleRequest(options, appliedQuery));
+      } catch (error) {
+        return of({
+          error: { message: error instanceof Error ? error.message : 'Unknown error occurred' },
+          data: [],
+        });
+      }
+    }
     if (targets.deepql?.length) {
       try {
         const appliedQuery = this.applyVariables(targets.deepql[0], options.scopedVars);
@@ -182,31 +207,30 @@ export class DeepDataSource extends DataSourceWithBackend<DeepQuery, MyDataSourc
   }
 
   async metadataRequest(url: string, params = {}) {
-    return await lastValueFrom(this._request(url, params, {method: 'GET', hideFromInspector: true}));
+    return await lastValueFrom(this._request(url, params, { method: 'GET', hideFromInspector: true }));
   }
 
   private _request(apiUrl: string, data?: any, options?: Partial<BackendSrvRequest>): Observable<Record<string, any>> {
     const params = data ? serializeParams(data) : '';
     const url = `${this.instanceSettings.url}${apiUrl}${params.length ? `?${params}` : ''}`;
-    const req = {...options, url};
+    const req = { ...options, url };
 
     return getBackendSrv().fetch(req);
   }
 
   private handleSingleRequest(options: DataQueryRequest<DeepQuery>, appliedQuery: DeepQuery) {
-
     const req: DataQueryRequest<DeepQuery> = {
       ...options,
-      targets: [appliedQuery]
-    }
+      targets: [appliedQuery],
+    };
 
     return super.query(req).pipe(
-        map((response) => {
-          if (response.error) {
-            return response;
-          }
-          return transformSnapshot(response);
-        })
+      map((response) => {
+        if (response.error) {
+          return response;
+        }
+        return transformSnapshot(response);
+      })
     );
   }
 }
