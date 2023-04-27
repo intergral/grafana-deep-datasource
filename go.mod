@@ -2,7 +2,12 @@ module github.com/asd/backend
 
 go 1.19
 
-require github.com/grafana/grafana-plugin-sdk-go v0.159.0
+require (
+	github.com/go-kit/log v0.2.1
+	github.com/golang/protobuf v1.5.2
+	github.com/grafana/grafana-plugin-sdk-go v0.159.0
+	github.com/intergral/go-deep-proto v0.0.12
+)
 
 require (
 	github.com/BurntSushi/toml v1.2.1 // indirect
@@ -16,13 +21,11 @@ require (
 	github.com/elazarl/goproxy v0.0.0-20220115173737-adb46da277ac // indirect
 	github.com/fatih/color v1.7.0 // indirect
 	github.com/getkin/kin-openapi v0.112.0 // indirect
-	github.com/go-kit/log v0.2.1 // indirect
 	github.com/go-logfmt/logfmt v0.5.1 // indirect
 	github.com/go-logr/logr v1.2.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-openapi/jsonpointer v0.19.5 // indirect
 	github.com/go-openapi/swag v0.19.15 // indirect
-	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/golang/snappy v0.0.3 // indirect
 	github.com/google/flatbuffers v2.0.0+incompatible // indirect
 	github.com/google/go-cmp v0.5.9 // indirect
@@ -34,7 +37,6 @@ require (
 	github.com/hashicorp/go-hclog v0.14.1 // indirect
 	github.com/hashicorp/go-plugin v1.4.3 // indirect
 	github.com/hashicorp/yamux v0.0.0-20181012175058-2f1d1f20f75d // indirect
-	github.com/intergral/go-deep-proto v0.0.12 // indirect
 	github.com/invopop/yaml v0.1.0 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
