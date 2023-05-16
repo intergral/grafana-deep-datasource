@@ -14,65 +14,59 @@
  *    limitations under the License.
  */
 
-import React from "react"
-import {InlineField, RadioButtonGroup} from "@grafana/ui";
-import {Props} from "../QueryEditor";
-import {DeepTracepointQueryType} from "../../types";
-import {config, reportInteraction} from "@grafana/runtime";
-import {SelectableValue} from "@grafana/data";
-import {TracepointList} from "./TracepointList";
-import {TracepointDelete} from "./TracepointDelete";
-import {TracepointCreate} from "./TracepointCreate";
+import React from 'react';
+import { InlineField, RadioButtonGroup } from '@grafana/ui';
+import { Props } from '../QueryEditor';
+import { DeepTracepointQueryType } from '../../types';
+import { config, reportInteraction } from '@grafana/runtime';
+import { SelectableValue } from '@grafana/data';
+import { TracepointList } from './TracepointList';
+import { TracepointDelete } from './TracepointDelete';
+import { TracepointCreate } from './TracepointCreate';
 
+export const TracepointSearch = ({ datasource, query, onChange, onRunQuery, app }: Props) => {
+  let queryTypeOptions: Array<SelectableValue<DeepTracepointQueryType>> = [
+    { value: 'list', label: 'List Tracepoints' },
+    { value: 'create', label: 'Create Tracepoint' },
+    { value: 'delete', label: 'Delete Tracepoint' },
+  ];
 
-export const TracepointSearch = ({datasource, query, onChange, onRunQuery, app}: Props) => {
-    let queryTypeOptions: Array<SelectableValue<DeepTracepointQueryType>> = [
-        {value: 'list', label: 'List Tracepoints'},
-        {value: 'create', label: 'Create Tracepoint'},
-        {value: 'delete', label: 'Delete Tracepoint'},
-    ];
+  if (!query.tpQueryType) {
+    query.tpQueryType = 'list';
+  }
 
+  return (
+    <>
+      <InlineField label="Tracepoint Action">
+        <RadioButtonGroup<DeepTracepointQueryType>
+          options={queryTypeOptions}
+          value={query.tpQueryType}
+          onChange={(v) => {
+            reportInteraction('grafana_snapshot_query_type_changed', {
+              datasourceType: 'deep',
+              app: app ?? '',
+              grafana_version: config.buildInfo.version,
+              newTpQueryType: v,
+              previousTpQueryType: query.tpQueryType ?? '',
+            });
 
-    if (!query.tpQueryType) {
-        query.tpQueryType = 'list';
-    }
-
-    return (
-        <>
-            <InlineField label="Tracepoint Action">
-                <RadioButtonGroup<DeepTracepointQueryType>
-                    options={queryTypeOptions}
-                    value={query.tpQueryType}
-                    onChange={(v) => {
-                        reportInteraction('grafana_snapshot_query_type_changed', {
-                            datasourceType: 'deep',
-                            app: app ?? '',
-                            grafana_version: config.buildInfo.version,
-                            newTpQueryType: v,
-                            previousTpQueryType: query.tpQueryType ?? '',
-                        });
-
-                        onChange({
-                            ...query,
-                            tpQueryType: v,
-                        });
-                    }}
-                    size="md"
-                />
-            </InlineField>
-            {query.tpQueryType === "list" && (
-                <TracepointList
-                    query={query}
-                    onChange={onChange}
-                    onRunQuery={onRunQuery}
-                    datasource={datasource}/>
-            )}
-            {query.tpQueryType === 'delete' && (
-                <TracepointDelete datasource={datasource} query={query} onRunQuery={onRunQuery} onChange={onChange}/>
-            )}
-            {query.tpQueryType === 'create' && (
-                <TracepointCreate datasource={datasource} query={query} onRunQuery={onRunQuery} onChange={onChange}/>
-            )}
-        </>
-    )
-}
+            onChange({
+              ...query,
+              tpQueryType: v,
+            });
+          }}
+          size="md"
+        />
+      </InlineField>
+      {query.tpQueryType === 'list' && (
+        <TracepointList query={query} onChange={onChange} onRunQuery={onRunQuery} datasource={datasource} />
+      )}
+      {query.tpQueryType === 'delete' && (
+        <TracepointDelete datasource={datasource} query={query} onRunQuery={onRunQuery} onChange={onChange} />
+      )}
+      {query.tpQueryType === 'create' && (
+        <TracepointCreate datasource={datasource} query={query} onRunQuery={onRunQuery} onChange={onChange} />
+      )}
+    </>
+  );
+};

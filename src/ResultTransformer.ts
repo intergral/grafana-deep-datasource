@@ -184,8 +184,10 @@ export function transformSnapshot(response: DataQueryResponse): DataQueryRespons
   return response;
 }
 
-export function transformTracepoint(response: DataQueryResponse, instanceSettings: DataSourceInstanceSettings<DeepDatasourceOptions>): DataQueryResponse {
-
+export function transformTracepoint(
+  response: DataQueryResponse,
+  instanceSettings: DataSourceInstanceSettings<DeepDatasourceOptions>
+): DataQueryResponse {
   response.data[0].fields[0].config = {
     unit: 'string',
     displayNameFromDS: 'Tracepoint ID',
@@ -201,10 +203,10 @@ export function transformTracepoint(response: DataQueryResponse, instanceSetting
             search: 'tp="${__value.raw}"',
             queryType: 'search',
           },
-        }
+        },
       },
     ],
-  }
+  };
 
   response.data[0].fields.push({
     name: 'Delete',
@@ -224,14 +226,12 @@ export function transformTracepoint(response: DataQueryResponse, instanceSetting
               tpQueryType: 'delete',
               queryType: 'tracepoint',
             },
-          }
+          },
         },
       ],
     },
-    values: [
-        ...response.data[0].fields[0].values
-    ]
-  })
+    values: [...response.data[0].fields[0].values],
+  });
 
-  return response
+  return response;
 }

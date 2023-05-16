@@ -16,18 +16,17 @@
 
 export function serializeParams(data: Record<string, any>): string {
   return Object.keys(data)
-      .map((key) => {
-          const value = data[key];
-          if (Array.isArray(value)) {
-              return value.map((arrayValue) => `${encodeURIComponent(key)}=${encodeURIComponent(arrayValue)}`).join('&');
-          }
-          return `${encodeURIComponent(key)}=${encodeURIComponent(value)}`;
-      })
-      .join('&');
+    .map((key) => {
+      const value = data[key];
+      if (Array.isArray(value)) {
+        return value.map((arrayValue) => `${encodeURIComponent(key)}=${encodeURIComponent(arrayValue)}`).join('&');
+      }
+      return `${encodeURIComponent(key)}=${encodeURIComponent(value)}`;
+    })
+    .join('&');
 }
 
-
 export function isValidID(id: string): boolean {
-    const hexOnlyRegex = /^[0-9A-Fa-f]*$/;
-    return !!id.trim().match(hexOnlyRegex);
+  const hexOnlyRegex = /^[0-9A-Fa-f]*$/;
+  return !!id.trim().match(hexOnlyRegex);
 }

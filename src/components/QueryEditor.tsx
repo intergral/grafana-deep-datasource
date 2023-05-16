@@ -23,7 +23,7 @@ import { DeepQueryType, DeepDatasourceOptions, DeepQuery } from '../types';
 import { config, reportInteraction } from '@grafana/runtime';
 import NativeSearch from './NativeSearch';
 import { FindByIDSearch } from './FindByIDSearch';
-import {TracepointSearch} from "./tracepoints/TracepointSearch";
+import { TracepointSearch } from './tracepoints/TracepointSearch';
 
 export type Props = QueryEditorProps<DeepDataSource, DeepQuery, DeepDatasourceOptions>;
 

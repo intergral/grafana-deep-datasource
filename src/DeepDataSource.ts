@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-import {CoreApp, DataQueryRequest, DataQueryResponse, DataSourceInstanceSettings, ScopedVars} from '@grafana/data';
+import { CoreApp, DataQueryRequest, DataQueryResponse, DataSourceInstanceSettings, ScopedVars } from '@grafana/data';
 import {
   BackendSrvRequest,
   config,
@@ -25,16 +25,16 @@ import {
   TemplateSrv,
 } from '@grafana/runtime';
 
-import {DeepDatasourceOptions, DeepQuery, DEFAULT_FIRE_COUNT, DEFAULT_QUERY, SearchQueryParams} from './types';
+import { DeepDatasourceOptions, DeepQuery, DEFAULT_FIRE_COUNT, DEFAULT_QUERY, SearchQueryParams } from './types';
 import DeepLanguageProvider from './DeepLanguageProvider';
-import {catchError, lastValueFrom, map, merge, Observable, of} from 'rxjs';
-import {serializeParams} from 'Utils';
-import {groupBy, identity, pick, pickBy} from 'lodash';
+import { catchError, lastValueFrom, map, merge, Observable, of } from 'rxjs';
+import { serializeParams } from 'Utils';
+import { groupBy, identity, pick, pickBy } from 'lodash';
 import {
   createTableFrameFromSearch,
   createTableFrameFromTraceQlQuery,
   transformSnapshot,
-  transformTracepoint
+  transformTracepoint,
 } from 'ResultTransformer';
 
 export const DEFAULT_LIMIT = 20;
@@ -43,8 +43,8 @@ export class DeepDataSource extends DataSourceWithBackend<DeepQuery, DeepDatasou
   languageProvider: DeepLanguageProvider;
 
   constructor(
-      private instanceSettings: DataSourceInstanceSettings<DeepDatasourceOptions>,
-      private readonly templateSrv: TemplateSrv = getTemplateSrv()
+    private instanceSettings: DataSourceInstanceSettings<DeepDatasourceOptions>,
+    private readonly templateSrv: TemplateSrv = getTemplateSrv()
   ) {
     super(instanceSettings);
     this.languageProvider = new DeepLanguageProvider(this);
@@ -74,7 +74,7 @@ export class DeepDataSource extends DataSourceWithBackend<DeepQuery, DeepDatasou
           hasSearch: !!deepQuery.search,
         });
 
-        const timeRange = {startTime: options.range.from.unix(), endTime: options.range.to.unix()};
+        const timeRange = { startTime: options.range.from.unix(), endTime: options.range.to.unix() };
         const query = this.applyVariables(deepQuery, options.scopedVars);
         const searchQuery = this.buildSearchQuery(query, timeRange);
         queries.push(
@@ -91,7 +91,7 @@ export class DeepDataSource extends DataSourceWithBackend<DeepQuery, DeepDatasou
         );
       } catch (error) {
         return of({
-          error: {message: error instanceof Error ? error.message : 'Unknown error occurred'},
+          error: { message: error instanceof Error ? error.message : 'Unknown error occurred' },
           data: [],
         });
       }
@@ -111,7 +111,7 @@ export class DeepDataSource extends DataSourceWithBackend<DeepQuery, DeepDatasou
         queries.push(this.handleTracepointQuery(options, appliedQuery));
       } catch (error) {
         return of({
-          error: {message: error instanceof Error ? error.message : 'Unknown error occurred'},
+          error: { message: error instanceof Error ? error.message : 'Unknown error occurred' },
           data: [],
         });
       }
@@ -250,12 +250,12 @@ export class DeepDataSource extends DataSourceWithBackend<DeepQuery, DeepDatasou
     };
 
     return super.query(req).pipe(
-        map((response) => {
-          if (response.error) {
-            return response;
-          }
-          return transformSnapshot(response);
-        })
+      map((response) => {
+        if (response.error) {
+          return response;
+        }
+        return transformSnapshot(response);
+      })
     );
   }
 
@@ -266,12 +266,12 @@ export class DeepDataSource extends DataSourceWithBackend<DeepQuery, DeepDatasou
     };
 
     return super.query(req).pipe(
-        map((response) => {
-          if (response.error) {
-            return response;
-          }
-          return transformTracepoint(response, this.instanceSettings);
-        })
+      map((response) => {
+        if (response.error) {
+          return response;
+        }
+        return transformTracepoint(response, this.instanceSettings);
+      })
     );
   }
 
@@ -284,34 +284,34 @@ export class DeepDataSource extends DataSourceWithBackend<DeepQuery, DeepDatasou
           path: appliedQuery.tpCreate.path,
           line_number: appliedQuery.tpCreate.line_number,
           args: {
-            fire_count: `${appliedQuery.tpCreate.fire_count ?? DEFAULT_FIRE_COUNT}`
+            fire_count: `${appliedQuery.tpCreate.fire_count ?? DEFAULT_FIRE_COUNT}`,
           },
           watches: appliedQuery.tpCreate.watches,
-          targeting: this.parseTargeting(appliedQuery.tpCreate.targeting)
-        }
-      }
+          targeting: this.parseTargeting(appliedQuery.tpCreate.targeting),
+        },
+      },
     });
   }
 
   handleDeleteTracepoint(appliedQuery: DeepQuery): Observable<Record<string, any>> {
-    return this._request(`/tracepoints/api/tracepoints/${appliedQuery.query}`, undefined, {method: 'delete'})
+    return this._request(`/tracepoints/api/tracepoints/${appliedQuery.query}`, undefined, { method: 'delete' });
   }
 
   private parseTargeting(targeting: string | undefined) {
     if (!targeting) {
-      return []
+      return [];
     }
 
-    const kvs = []
-    const parts = targeting.split(" ");
+    const kvs = [];
+    const parts = targeting.split(' ');
     for (const part of parts) {
-      const [key, value] = part.split("=")
+      const [key, value] = part.split('=');
       kvs.push({
         key,
-        value: {stringValue: value.substring(1, value.length-1)}
-      })
+        value: { stringValue: value.substring(1, value.length - 1) },
+      });
     }
 
-    return kvs
+    return kvs;
   }
 }
