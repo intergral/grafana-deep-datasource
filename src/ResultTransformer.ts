@@ -91,7 +91,7 @@ export function createTableFrameFromTraceQlQuery(
   const tableRows = data
     // Show the most recent traces
     .sort((a, b) => parseInt(b?.startTimeUnixNano!, 10) / 1000000 - parseInt(a?.startTimeUnixNano!, 10) / 1000000)
-    .reduce((rows: SnapshotTableData[], trace, currentIndex) => {
+    .reduce((rows: SnapshotTableData[], trace) => {
       const traceData: SnapshotTableData = transformToTraceData(trace);
       rows.push(traceData);
       // subDataFrames.push(traceSubFrame(trace, instanceSettings, currentIndex));
@@ -182,4 +182,56 @@ function transformToTraceData(data: SnapshotSearchMetadata): SnapshotTableData {
 
 export function transformSnapshot(response: DataQueryResponse): DataQueryResponse {
   return response;
+}
+
+export function transformTracepoint(response: DataQueryResponse, instanceSettings: DataSourceInstanceSettings<DeepDatasourceOptions>): DataQueryResponse {
+
+  response.data[0].fields[0].config = {
+    unit: 'string',
+    displayNameFromDS: 'Tracepoint ID',
+    links: [
+      {
+        title: 'View: ${__value.raw}',
+        url: '',
+        internal: {
+          datasourceUid: instanceSettings.uid,
+          datasourceName: instanceSettings.name,
+          query: {
+            query: '',
+            search: 'tp="${__value.raw}"',
+            queryType: 'search',
+          },
+        }
+      },
+    ],
+  }
+
+  response.data[0].fields.push({
+    name: 'Delete',
+    type: FieldType.string,
+    config: {
+      unit: 'string',
+      displayNameFromDS: 'Delete',
+      links: [
+        {
+          title: 'Delete: ${__value.raw}',
+          url: '',
+          internal: {
+            datasourceUid: instanceSettings.uid,
+            datasourceName: instanceSettings.name,
+            query: {
+              query: '${__value.raw}',
+              tpQueryType: 'delete',
+              queryType: 'tracepoint',
+            },
+          }
+        },
+      ],
+    },
+    values: [
+        ...response.data[0].fields[0].values
+    ]
+  })
+
+  return response
 }

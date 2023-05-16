@@ -6,7 +6,7 @@ require (
 	github.com/go-kit/log v0.2.1
 	github.com/golang/protobuf v1.5.2
 	github.com/grafana/grafana-plugin-sdk-go v0.159.0
-	github.com/intergral/go-deep-proto v0.0.12
+	github.com/intergral/go-deep-proto v0.0.13
 )
 
 require (

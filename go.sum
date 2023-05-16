@@ -212,8 +212,8 @@ github.com/hashicorp/yamux v0.0.0-20180604194846-3520598351bb/go.mod h1:+NfK9FKe
 github.com/hashicorp/yamux v0.0.0-20181012175058-2f1d1f20f75d h1:kJCB4vdITiW1eC1vq2e6IsrXKrZit1bv/TDYFGMp4BQ=
 github.com/hashicorp/yamux v0.0.0-20181012175058-2f1d1f20f75d/go.mod h1:+NfK9FKeTrX5uv1uIXGdwYDTeHna2qgaIlx54MXqjAM=
 github.com/ianlancetaylor/demangle v0.0.0-20181102032728-5e5cf60278f6/go.mod h1:aSSvb/t6k1mPoxDqO4vJh6VOCGPwU4O0C2/Eqndh1Sc=
-github.com/intergral/go-deep-proto v0.0.12 h1:hH27LMCUYjNF1zlQVUqMQTW3ZbOn9l9PT1/c6OSKK+s=
-github.com/intergral/go-deep-proto v0.0.12/go.mod h1:kYiHIYAykVITDekpSAu1y9Z8Hr6OKpoYJGorm9uaeak=
+github.com/intergral/go-deep-proto v0.0.13 h1:kN9Ln+APJ1v1FWNDDUXtMrIS5N9ExCuJsaUmCPJlNi0=
+github.com/intergral/go-deep-proto v0.0.13/go.mod h1:kYiHIYAykVITDekpSAu1y9Z8Hr6OKpoYJGorm9uaeak=
 github.com/invopop/yaml v0.1.0 h1:YW3WGUoJEXYfzWBjn00zIlrw7brGVD0fUKRYDPAPhrc=
 github.com/invopop/yaml v0.1.0/go.mod h1:2XuRLgs/ouIrW3XNzuNj7J3Nvu/Dig5MXvbCEdiBN3Q=
 github.com/jhump/protoreflect v1.6.0 h1:h5jfMVslIg6l29nsMs0D8Wj17RDVdNYti0vDN/PZZoE=

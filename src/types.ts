@@ -26,6 +26,18 @@ export interface DeepQuery extends DataQuery {
   query: string;
 
   queryType: DeepQueryType;
+  tpQueryType?: DeepTracepointQueryType;
+  tpCreate: DeepTracepointCreateConfig;
+}
+
+export const DEFAULT_FIRE_COUNT = 1;
+
+export interface DeepTracepointCreateConfig {
+  targeting?: string;
+  path: string;
+  line_number: number;
+  fire_count: number;
+  watches: string[];
 }
 
 export interface SearchQueryParams {
@@ -68,4 +80,5 @@ export interface SnapshotTableData {
   durationNano?: string;
 }
 
-export type DeepQueryType = 'deepql' | 'search' | 'byid';
+export type DeepQueryType = 'deepql' | 'search' | 'byid' | 'tracepoint';
+export type DeepTracepointQueryType = 'list' | 'create' | 'delete';

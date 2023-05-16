@@ -28,6 +28,7 @@ import (
 	"github.com/grafana/grafana-plugin-sdk-go/backend/instancemgmt"
 	"github.com/grafana/grafana-plugin-sdk-go/data"
 	"github.com/intergral/go-deep-proto/common/v1"
+	deep_pp "github.com/intergral/go-deep-proto/poll/v1"
 	deep_tp "github.com/intergral/go-deep-proto/tracepoint/v1"
 	"io"
 	"net/http"
@@ -95,7 +96,14 @@ func (d *DeepDatasource) QueryData(ctx context.Context, req *backend.QueryDataRe
 
 	// loop over queries and execute them individually.
 	for _, q := range req.Queries {
-		res := d.query(ctx, req.PluginContext, q)
+		var res backend.DataResponse
+		switch q.QueryType {
+		case "deepql":
+		case "byid":
+			res = d.queryByID(ctx, req.PluginContext, q)
+		case "tracepoint":
+			res = d.queryTracepoint(ctx, req.PluginContext, q)
+		}
 
 		// save the response in a hashmap
 		// based on with RefID as identifier
@@ -112,7 +120,50 @@ type queryModel struct {
 	Query       string `json:"query"`
 }
 
-func (d *DeepDatasource) query(_ context.Context, pCtx backend.PluginContext, query backend.DataQuery) backend.DataResponse {
+func (d *DeepDatasource) queryTracepoint(_ context.Context, pCtx backend.PluginContext, query backend.DataQuery) backend.DataResponse {
+
+	url := fmt.Sprintf("%v/tracepoints/api/tracepoints", pCtx.DataSourceInstanceSettings.URL)
+
+	request, err := http.NewRequest(http.MethodGet, url, nil)
+	if err != nil {
+		return backend.ErrDataResponse(backend.StatusBadRequest, fmt.Sprintf("cannot build request: %v", err.Error()))
+	}
+	request.Header.Set("Accept", "application/protobuf")
+
+	response, err := d.client.Do(request)
+	if err != nil {
+		return backend.ErrDataResponse(backend.StatusBadRequest, fmt.Sprintf("request failed: %v", err.Error()))
+	}
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			_ = d.log.Log("msg", "failed to close response body", "err", err)
+		}
+	}(response.Body)
+
+	all, err := io.ReadAll(response.Body)
+	if err != nil {
+		return backend.ErrDataResponse(backend.StatusBadRequest, fmt.Sprintf("read failed: %v", err.Error()))
+	}
+
+	var pollResponse deep_pp.PollResponse
+	err = proto.Unmarshal(all, &pollResponse)
+	if err != nil {
+		return backend.ErrDataResponse(backend.StatusBadRequest, fmt.Sprintf("response failed: %v", err.Error()))
+	}
+
+	frame, err := pollResponseToFrame(&pollResponse)
+	if err != nil {
+		return backend.ErrDataResponse(backend.StatusBadRequest, fmt.Sprintf("convertion failed: %v", err.Error()))
+	}
+
+	frame.RefID = query.RefID
+	return backend.DataResponse{
+		Frames: []*data.Frame{frame},
+	}
+}
+
+func (d *DeepDatasource) queryByID(_ context.Context, pCtx backend.PluginContext, query backend.DataQuery) backend.DataResponse {
 
 	// Unmarshal the JSON into our queryModel.
 	var qm queryModel
@@ -161,6 +212,32 @@ func (d *DeepDatasource) query(_ context.Context, pCtx backend.PluginContext, qu
 	return backend.DataResponse{
 		Frames: []*data.Frame{frame},
 	}
+}
+
+func pollResponseToFrame(pollResponse *deep_pp.PollResponse) (*data.Frame, error) {
+	frame := &data.Frame{
+		Name: "Tracepoint",
+		Fields: []*data.Field{
+			data.NewField("ID", nil, []string{}),
+			data.NewField("Path", nil, []string{}),
+			data.NewField("Line", nil, []uint32{}),
+			data.NewField("Args", nil, []json.RawMessage{}),
+			data.NewField("Watches", nil, []json.RawMessage{}),
+			data.NewField("Targeting", nil, []json.RawMessage{}),
+		},
+		Meta: &data.FrameMeta{
+			PreferredVisualization: "table",
+		},
+	}
+
+	for _, tp := range pollResponse.Response {
+		tpArgs, _ := json.Marshal(tp.Args)
+		tpWatches, _ := json.Marshal(tp.Watches)
+		tpTargeting, _ := json.Marshal(keyValuesToMap(tp.Targeting))
+		frame.AppendRow(tp.ID, tp.Path, tp.LineNumber, json.RawMessage(tpArgs), json.RawMessage(tpWatches), json.RawMessage(tpTargeting))
+	}
+
+	return frame, nil
 }
 
 func snapshotToFrame(snap *deep_tp.Snapshot) (*data.Frame, error) {

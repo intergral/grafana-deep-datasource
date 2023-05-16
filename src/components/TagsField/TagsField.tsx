@@ -133,11 +133,6 @@ function useAutocomplete(datasource: DeepDataSource) {
         const tags = datasource.languageProvider.getTags();
 
         if (tags) {
-          // This is needed because the /api/search/tag/${tag}/values API expects "status.code" and the v2 API expects "status"
-          // so Tempo doesn't send anything and we inject it here for the autocomplete
-          if (!tags.find((t) => t === 'status.code')) {
-            tags.push('status.code');
-          }
           providerRef.current.setTags(tags);
         }
       } catch (error) {
@@ -190,6 +185,7 @@ interface EditorStyles {
 const getStyles = (theme: GrafanaTheme2, placeholder: string): EditorStyles => {
   return {
     queryField: css`
+      height: 32px;
       border-radius: ${theme.shape.borderRadius()};
       border: 1px solid ${theme.components.input.borderColor};
       flex: 1;

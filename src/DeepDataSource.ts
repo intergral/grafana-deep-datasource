@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-import { CoreApp, DataQueryRequest, DataQueryResponse, DataSourceInstanceSettings, ScopedVars } from '@grafana/data';
+import {CoreApp, DataQueryRequest, DataQueryResponse, DataSourceInstanceSettings, ScopedVars} from '@grafana/data';
 import {
   BackendSrvRequest,
   config,
@@ -25,12 +25,17 @@ import {
   TemplateSrv,
 } from '@grafana/runtime';
 
-import { DeepQuery, DEFAULT_QUERY, DeepDatasourceOptions, SearchQueryParams } from './types';
+import {DeepDatasourceOptions, DeepQuery, DEFAULT_FIRE_COUNT, DEFAULT_QUERY, SearchQueryParams} from './types';
 import DeepLanguageProvider from './DeepLanguageProvider';
-import { catchError, lastValueFrom, map, merge, Observable, of } from 'rxjs';
-import { serializeParams } from 'Utils';
-import { groupBy, identity, pick, pickBy } from 'lodash';
-import { createTableFrameFromSearch, createTableFrameFromTraceQlQuery, transformSnapshot } from 'ResultTransformer';
+import {catchError, lastValueFrom, map, merge, Observable, of} from 'rxjs';
+import {serializeParams} from 'Utils';
+import {groupBy, identity, pick, pickBy} from 'lodash';
+import {
+  createTableFrameFromSearch,
+  createTableFrameFromTraceQlQuery,
+  transformSnapshot,
+  transformTracepoint
+} from 'ResultTransformer';
 
 export const DEFAULT_LIMIT = 20;
 
@@ -38,8 +43,8 @@ export class DeepDataSource extends DataSourceWithBackend<DeepQuery, DeepDatasou
   languageProvider: DeepLanguageProvider;
 
   constructor(
-    private instanceSettings: DataSourceInstanceSettings<DeepDatasourceOptions>,
-    private readonly templateSrv: TemplateSrv = getTemplateSrv()
+      private instanceSettings: DataSourceInstanceSettings<DeepDatasourceOptions>,
+      private readonly templateSrv: TemplateSrv = getTemplateSrv()
   ) {
     super(instanceSettings);
     this.languageProvider = new DeepLanguageProvider(this);
@@ -60,8 +65,8 @@ export class DeepDataSource extends DataSourceWithBackend<DeepQuery, DeepDatasou
     if (targets.search?.length) {
       const deepQuery = targets.search[0];
       try {
-        reportInteraction('grafana_traces_search_queried', {
-          datasourceType: 'tempo',
+        reportInteraction('grafana_snapshot_search_queried', {
+          datasourceType: 'deep',
           app: options.app ?? '',
           grafana_version: config.buildInfo.version,
           hasServiceName: !!deepQuery.serviceName,
@@ -69,7 +74,7 @@ export class DeepDataSource extends DataSourceWithBackend<DeepQuery, DeepDatasou
           hasSearch: !!deepQuery.search,
         });
 
-        const timeRange = { startTime: options.range.from.unix(), endTime: options.range.to.unix() };
+        const timeRange = {startTime: options.range.from.unix(), endTime: options.range.to.unix()};
         const query = this.applyVariables(deepQuery, options.scopedVars);
         const searchQuery = this.buildSearchQuery(query, timeRange);
         queries.push(
@@ -86,7 +91,27 @@ export class DeepDataSource extends DataSourceWithBackend<DeepQuery, DeepDatasou
         );
       } catch (error) {
         return of({
-          error: { message: error instanceof Error ? error.message : 'Unknown error occurred' },
+          error: {message: error instanceof Error ? error.message : 'Unknown error occurred'},
+          data: [],
+        });
+      }
+    }
+
+    if (targets.tracepoint?.length) {
+      try {
+        const appliedQuery = this.applyVariables(targets.tracepoint[0], options.scopedVars);
+        const queryValue = appliedQuery?.query || '';
+        reportInteraction('grafana_traces_tracepoints_queried', {
+          datasourceType: 'deep',
+          app: options.app ?? '',
+          grafana_version: config.buildInfo.version,
+          hasQuery: queryValue !== '',
+        });
+
+        queries.push(this.handleTracepointQuery(options, appliedQuery));
+      } catch (error) {
+        return of({
+          error: {message: error instanceof Error ? error.message : 'Unknown error occurred'},
           data: [],
         });
       }
@@ -173,7 +198,7 @@ export class DeepDataSource extends DataSourceWithBackend<DeepQuery, DeepDatasou
     tempoQuery = pickBy(tempoQuery, identity);
 
     if (query.serviceName) {
-      tags += ` service.name="${query.serviceName}"`;
+      tags += `service.name="${query.serviceName}"`;
     }
 
     // Set default limit
@@ -225,12 +250,68 @@ export class DeepDataSource extends DataSourceWithBackend<DeepQuery, DeepDatasou
     };
 
     return super.query(req).pipe(
-      map((response) => {
-        if (response.error) {
-          return response;
-        }
-        return transformSnapshot(response);
-      })
+        map((response) => {
+          if (response.error) {
+            return response;
+          }
+          return transformSnapshot(response);
+        })
     );
+  }
+
+  private handleTracepointQuery(options: DataQueryRequest<DeepQuery>, appliedQuery: DeepQuery) {
+    const req: DataQueryRequest<DeepQuery> = {
+      ...options,
+      targets: [appliedQuery],
+    };
+
+    return super.query(req).pipe(
+        map((response) => {
+          if (response.error) {
+            return response;
+          }
+          return transformTracepoint(response, this.instanceSettings);
+        })
+    );
+  }
+
+  handleCreateTracepoint(appliedQuery: DeepQuery): Observable<Record<string, any>> {
+    return getBackendSrv().fetch({
+      url: `${this.instanceSettings.url}/tracepoints/api/tracepoints`,
+      method: 'post',
+      data: {
+        Tracepoint: {
+          path: appliedQuery.tpCreate.path,
+          line_number: appliedQuery.tpCreate.line_number,
+          args: {
+            fire_count: `${appliedQuery.tpCreate.fire_count ?? DEFAULT_FIRE_COUNT}`
+          },
+          watches: appliedQuery.tpCreate.watches,
+          targeting: this.parseTargeting(appliedQuery.tpCreate.targeting)
+        }
+      }
+    });
+  }
+
+  handleDeleteTracepoint(appliedQuery: DeepQuery): Observable<Record<string, any>> {
+    return this._request(`/tracepoints/api/tracepoints/${appliedQuery.query}`, undefined, {method: 'delete'})
+  }
+
+  private parseTargeting(targeting: string | undefined) {
+    if (!targeting) {
+      return []
+    }
+
+    const kvs = []
+    const parts = targeting.split(" ");
+    for (const part of parts) {
+      const [key, value] = part.split("=")
+      kvs.push({
+        key,
+        value: {stringValue: value.substring(1, value.length-1)}
+      })
+    }
+
+    return kvs
   }
 }

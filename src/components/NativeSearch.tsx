@@ -90,15 +90,15 @@ const NativeSearch = ({ datasource, query, onChange, onBlur, onRunQuery }: Props
     }
   };
 
-  const handleOnChange = useCallback(
-    (value: string) => {
-      onChange({
-        ...query,
-        search: value,
-      });
-    },
-    [onChange, query]
-  );
+  const [tagConfig, setTagConfig] = useState<string>("")
+
+  useEffect(()=>{
+    onChange({
+      ...query,
+      search: tagConfig,
+    })
+  }, [tagConfig])
+
 
   return (
     <>
@@ -132,7 +132,7 @@ const NativeSearch = ({ datasource, query, onChange, onBlur, onRunQuery }: Props
             <TagsField
               placeholder="path=/some/file.py error=true"
               value={query.search || ''}
-              onChange={handleOnChange}
+              onChange={setTagConfig}
               onBlur={onBlur}
               datasource={datasource}
             />
@@ -141,7 +141,7 @@ const NativeSearch = ({ datasource, query, onChange, onBlur, onRunQuery }: Props
         <InlineFieldRow>
           <InlineField
             label="Limit"
-            invalid={!!inputErrors.limit}
+            invalid={inputErrors.limit}
             labelWidth={14}
             grow
             tooltip="Maximum number of returned results"
