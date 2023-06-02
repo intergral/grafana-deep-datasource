@@ -91,12 +91,13 @@ const NativeSearch = ({ datasource, query, onChange, onBlur, onRunQuery }: Props
 
   const [tagConfig, setTagConfig] = useState<string>('');
 
+
   useEffect(() => {
     onChange({
       ...query,
       search: tagConfig,
     });
-  }, [tagConfig]);
+  }, [tagConfig]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <>

@@ -38,7 +38,7 @@ export const TracepointCreate = ({ datasource, query, onChange, onRunQuery, onBl
         targeting: targeting,
       },
     });
-  }, [targeting]);
+  }, [targeting]); // eslint-disable-line react-hooks/exhaustive-deps
 
   function anyError() {
     return Object.values(inputErrors).some((v) => v);
