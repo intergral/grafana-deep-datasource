@@ -1,5 +1,6 @@
 /*
- *    Copyright 2023 Intergral GmbH
+ *    Copyright 2014-2021 Grafana Labs
+ *
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.

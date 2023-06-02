@@ -1,5 +1,6 @@
 /*
- *    Copyright 2023 Intergral GmbH
+ *    Copyright 2014-2021 Grafana Labs
+ *
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -22,7 +23,7 @@ import { CodeEditor, Monaco, monacoTypes, useTheme2 } from '@grafana/ui';
 
 import { CompletionProvider } from './autocomplete';
 import { languageDefinition } from './syntax';
-import { DeepDataSource } from '../../DeepDataSource';
+import { DeepDataSource } from '../../deepql/DeepDataSource';
 
 interface Props {
   placeholder: string;
@@ -136,10 +137,7 @@ function useAutocomplete(datasource: DeepDataSource) {
           providerRef.current.setTags(tags);
         }
       } catch (error) {
-        if (error instanceof Error) {
-          console.log(error);
-          // dispatch(notifyApp(createErrorNotification('Error', error)));
-        }
+        //todo what to do with error?
       }
     };
     fetchTags();

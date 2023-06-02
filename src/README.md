@@ -2,4 +2,4 @@
 
 # Backend
 
-Plugin to connect to DEEP.
+A Datasource plugin to connect grafana to [DEEP](https://github.com/intergral/deep).

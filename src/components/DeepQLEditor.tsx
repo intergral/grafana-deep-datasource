@@ -1,17 +1,18 @@
 /*
- *    Copyright 2023 Intergral GmbH
+ * Copyright (C) 2023  Intergral GmbH
  *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU Affero General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
  *
- *        http://www.apache.org/licenses/LICENSE-2.0
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU Affero General Public License for more details.
  *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
+ *     You should have received a copy of the GNU Affero General Public License
+ *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 import { css } from '@emotion/css';
@@ -21,17 +22,12 @@ import React, { useEffect, useRef } from 'react';
 import { GrafanaTheme2 } from '@grafana/data';
 import { reportInteraction } from '@grafana/runtime';
 import { CodeEditor, Monaco, monacoTypes, useTheme2 } from '@grafana/ui';
-
-// import { createErrorNotification } from '../../../../core/copy/appNotification';
-// import { notifyApp } from '../../../../core/reducers/appNotification';
-// import { dispatch } from '../../../../store/store';
-
-import { CompletionProvider, CompletionType } from '../autocomplete';
-import { languageDefinition } from '../deepql';
+import { CompletionProvider, CompletionType } from '../deepql/autocomplete';
+import { languageDefinition } from '../deepql/deepql';
 import { Props } from './QueryEditor';
 import { defaults } from 'lodash';
 import { DEFAULT_QUERY } from '../types';
-import { DeepDataSource } from '../DeepDataSource';
+import { DeepDataSource } from '../deepql/DeepDataSource';
 
 interface QLProps extends Props {
   placeholder: string;
@@ -182,8 +178,7 @@ function useAutocomplete(datasource: DeepDataSource) {
         }
       } catch (error) {
         if (error instanceof Error) {
-          console.log(error);
-          //dispatch(notifyApp(createErrorNotification('Error', error)));
+          //todo what to do with error?
         }
       }
     };

@@ -1,5 +1,6 @@
 /*
- *    Copyright 2023 Intergral GmbH
+ *    Copyright 2014-2021 Grafana Labs
+ *
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -25,14 +26,14 @@ import {
   TemplateSrv,
 } from '@grafana/runtime';
 
-import { DeepDatasourceOptions, DeepQuery, DEFAULT_FIRE_COUNT, DEFAULT_QUERY, SearchQueryParams } from './types';
+import { DeepDatasourceOptions, DeepQuery, DEFAULT_FIRE_COUNT, DEFAULT_QUERY, SearchQueryParams } from '../types';
 import DeepLanguageProvider from './DeepLanguageProvider';
 import { catchError, lastValueFrom, map, merge, Observable, of } from 'rxjs';
 import { serializeParams } from 'Utils';
 import { groupBy, identity, pick, pickBy } from 'lodash';
 import {
   createTableFrameFromSearch,
-  createTableFrameFromTraceQlQuery,
+  createTableFrameFromDeepQlQuery,
   transformSnapshot,
   transformTracepoint,
 } from 'ResultTransformer';
@@ -170,7 +171,7 @@ export class DeepDataSource extends DataSourceWithBackend<DeepQuery, DeepDatasou
             }).pipe(
               map((response) => {
                 return {
-                  data: createTableFrameFromTraceQlQuery(response.data.traces, this.instanceSettings),
+                  data: createTableFrameFromDeepQlQuery(response.data.traces, this.instanceSettings),
                 };
               }),
               catchError((error) => {

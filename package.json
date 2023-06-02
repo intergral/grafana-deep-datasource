@@ -1,7 +1,7 @@
 {
-  "name": "backend",
+  "name": "grafana-deep-datasource",
   "version": "0.0.1",
-  "description": "Qq",
+  "description": "Datasource plugin for DEEP",
   "scripts": {
     "build": "webpack -c ./.config/webpack/webpack.config.ts --env production",
     "dev": "webpack -w -c ./.config/webpack/webpack.config.ts --env development",
@@ -16,8 +16,8 @@
     "server": "docker compose up --build",
     "sign": "npx --yes @grafana/sign-plugin@latest"
   },
-  "author": "Asd",
-  "license": "Apache-2.0",
+  "author": "Intergral GmbH",
+  "license": "AGPL-3.0",
   "devDependencies": {
     "@babel/core": "^7.16.7",
     "@grafana/e2e": "9.3.8",
