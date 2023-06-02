@@ -6,10 +6,10 @@ services:
     build:
       context: ./.config
       args:
-        grafana_version: ${GRAFANA_VERSION:-dev}
+        grafana_version: ${GRAFANA_VERSION:-9.3.8}
         grafana_image: ${GRAFANA_IMAGE:-grafana-oss}
     ports:
-      - '3100:3000' # this needs to be 3000 for e2e tests
+      - '3000:3000' # this needs to be 3000 for e2e tests
       - '3222:3222' # this is for delve debugger
     cap_add:
       - SYS_PTRACE
@@ -18,5 +18,4 @@ services:
     volumes:
       - ./:/root/dev
       - ./dist:/var/lib/grafana/plugins/intergral-deep-datasource
-      - /home/bdonnell/repo/github/intergral/grafana-deep-panel/dist:/var/lib/grafana/plugins/intergral-deep-panel
       - ./provisioning:/etc/grafana/provisioning
