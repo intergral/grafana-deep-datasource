@@ -1,6 +1,6 @@
 {
   "name": "grafana-deep-datasource",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Datasource plugin for DEEP",
   "scripts": {
     "build": "webpack -c ./.config/webpack/webpack.config.ts --env production",
@@ -14,7 +14,8 @@
     "e2e": "yarn cypress install && yarn grafana-e2e run",
     "e2e:update": "yarn cypress install && yarn grafana-e2e run --update-screenshots",
     "server": "docker compose up --build",
-    "sign": "npx --yes @grafana/sign-plugin@latest"
+    "sign": "npx --yes @grafana/sign-plugin@latest",
+    "zip": "./build_zip.sh"
   },
   "author": "Intergral GmbH",
   "license": "AGPL-3.0",
