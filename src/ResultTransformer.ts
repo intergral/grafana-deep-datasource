@@ -182,7 +182,7 @@ export function transformTracepoint(
           datasourceName: instanceSettings.name,
           query: {
             query: '',
-            search: 'tp="${__value.raw}"',
+            search: 'tracepoint="${__value.raw}"',
             queryType: 'search',
           },
         },
