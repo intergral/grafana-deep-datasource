@@ -14,7 +14,7 @@
     "e2e": "yarn cypress install && yarn grafana-e2e run",
     "e2e:update": "yarn cypress install && yarn grafana-e2e run --update-screenshots",
     "server": "docker compose up --build",
-    "sign": "npx --yes @grafana/sign-plugin@latest",
+    "sign": "npx --yes @grafana/sign-plugin@latest --rootUrls=https://localhost",
     "zip": "./build_zip.sh"
   },
   "author": "Intergral GmbH",
