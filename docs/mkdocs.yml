@@ -1,0 +1,23 @@
+site_name: Deep Grafana Datasource
+site_url: https://intergral.github.com/grafana-deep-datasource/
+
+repo_name: Grafana Deep Datasource
+repo_url: https://github.com/intergral/grafana-deep-datasource
+
+copyright: Intergral GmbH 2023
+
+site_dir: _site
+
+theme:
+  name: material
+  features:
+    - content.code.copy
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
