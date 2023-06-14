@@ -29,7 +29,7 @@ If you are using the unsigned version of the build you need to add an exception 
    2. Here we hae also added the allowance for the panel plugin that this plugin requires.
 
 ## Using Docker
-If you are building a container with docker then you can simply use the pre-built [image](https://docker.hub).
+If you are building a container with docker then you can simply use the pre-built [image](https://hub.docker.com/r/intergral/grafana-deep).
 
 ### Existing builds
 If you are already building a custom docker image for Grafana then you can use docker build layers to add Deep.
