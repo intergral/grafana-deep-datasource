@@ -1,4 +1,4 @@
-# Intergral-Deep-Datasource Plugin
+# Deep Datasource Plugin
 
 This is a plugin for [Grafana](https://grafana.com) that allows for connections to
 the [Deep](https://github.com/intergral/deep).
