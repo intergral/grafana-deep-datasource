@@ -9,9 +9,14 @@ copyright: Intergral GmbH 2023
 site_dir: _site
 
 theme:
+  logo: https://github.com/intergral/deep/blob/master/docs/docs/images/logo/icon.png?raw=true
+  favicon: https://github.com/intergral/deep/blob/master/docs/docs/images/logo/icon.svg?raw=true
   name: material
   features:
     - content.code.copy
+
+extra_css:
+  - styles/styles.css
 
 markdown_extensions:
   - pymdownx.highlight:

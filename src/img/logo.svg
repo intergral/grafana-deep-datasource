@@ -1,26 +1,72 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!--
   - Copyright (C) 2023  Intergral GmbH
   -
-  -     This program is free software: you can redistribute it and/or modify
-  -     it under the terms of the GNU Affero General Public License as published by
-  -     the Free Software Foundation, either version 3 of the License, or
-  -     (at your option) any later version.
+  - This program is free software: you can redistribute it and/or modify
+  - it under the terms of the GNU Affero General Public License as published by
+  - the Free Software Foundation, either version 3 of the License, or
+  - (at your option) any later version.
   -
-  -     This program is distributed in the hope that it will be useful,
-  -     but WITHOUT ANY WARRANTY; without even the implied warranty of
-  -     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  -     GNU Affero General Public License for more details.
+  - This program is distributed in the hope that it will be useful,
+  - but WITHOUT ANY WARRANTY; without even the implied warranty of
+  - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  - GNU Affero General Public License for more details.
   -
-  -     You should have received a copy of the GNU Affero General Public License
-  -     along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  - You should have received a copy of the GNU Affero General Public License
+  - along with this program.  If not, see <https://www.gnu.org/licenses/>.
   -->
 
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="130px" height="130px" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g><path style="opacity:1" fill="#695BFC" d="M 58.5,15.5 C 82.9051,13.6219 102.072,22.6219 116,42.5C 129.402,69.4885 125.235,93.3218 103.5,114C 80.9037,130.098 57.9037,130.598 34.5,115.5C 14.2002,97.9808 8.0335,76.3141 16,50.5C 24.9179,32.3122 39.0845,20.6456 58.5,15.5 Z"/></g>
-<g><path style="opacity:1" fill="#392EB0" d="M 57.5,18.5 C 89.88,15.7473 110.713,29.7473 120,60.5C 123.261,92.8387 109.427,113.672 78.5,123C 46.1756,126.325 25.3423,112.492 16,81.5C 12.8331,49.1873 26.6664,28.1873 57.5,18.5 Z"/></g>
-<g><path style="opacity:1" fill="#fefefe" d="M 61.5,21.5 C 82.7236,20.6947 99.2236,29.028 111,46.5C 123.051,72.5422 117.884,94.3755 95.5,112C 66.0677,127.184 42.2344,121.017 24,93.5C 13.1715,68.0161 18.6715,46.8495 40.5,30C 47.0049,25.6716 54.0049,22.8382 61.5,21.5 Z"/></g>
-<g><path style="opacity:1" fill="#392EB0" d="M 63.5,27.5 C 67.3044,29.1314 69.8044,31.7981 71,35.5C 59.1244,47.0412 47.6244,58.8745 36.5,71C 47.6244,83.1255 59.1244,94.9588 71,106.5C 69.9099,109.785 67.7432,112.452 64.5,114.5C 51.514,102.014 38.6807,89.3475 26,76.5C 24,72.8333 24,69.1667 26,65.5C 38.702,52.9652 51.202,40.2985 63.5,27.5 Z"/></g>
-<g><path style="opacity:1" fill="#695BFC" d="M 89.5,45.5 C 96.7982,52.2974 103.965,59.2974 111,66.5C 111.667,69.5 111.667,72.5 111,75.5C 104,82.5 97,89.5 90,96.5C 87.5,94 85,91.5 82.5,89C 88.5452,83.2902 94.2118,77.2902 99.5,71C 94.5566,64.7192 89.2233,58.7192 83.5,53C 85.3198,50.3478 87.3198,47.8478 89.5,45.5 Z"/></g>
-</svg>
+<svg
+        xmlns:dc="http://purl.org/dc/elements/1.1/"
+        xmlns:cc="http://creativecommons.org/ns#"
+        xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+        xmlns:svg="http://www.w3.org/2000/svg"
+        xmlns="http://www.w3.org/2000/svg"
+        id="svg11"
+        xml:space="preserve"
+        enable-background="new 0 0 200 200"
+        viewBox="0 0 200 200"
+        y="0px"
+        x="0px"
+        version="1.1"><metadata
+     id="metadata15"><rdf:RDF><cc:Work
+         rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
+        rdf:resource="http://purl.org/dc/dcmitype/StillImage" /></cc:Work></rdf:RDF></metadata><defs
+        id="defs239513" /><linearGradient
+        spreadMethod="pad"
+        y2="30%"
+        x2="-10%"
+        y1="120%"
+        x1="30%"
+        id="3d_gradient2-logo-dea14503-2fd8-4e00-b1b5-bc5cc1a3e15b"><stop
+       id="stop239490"
+       stop-opacity="1"
+       stop-color="#ffffff"
+       offset="0%" /><stop
+        id="stop239492"
+        stop-opacity="1"
+        stop-color="#000000"
+        offset="100%" /></linearGradient><linearGradient
+        gradientTransform="rotate(-30)"
+        spreadMethod="pad"
+        y2="30%"
+        x2="-10%"
+        y1="120%"
+        x1="30%"
+        id="3d_gradient3-logo-dea14503-2fd8-4e00-b1b5-bc5cc1a3e15b"><stop
+       id="stop239495"
+       stop-opacity="1"
+       stop-color="#ffffff"
+       offset="0%" /><stop
+        id="stop239497"
+        stop-opacity="1"
+        stop-color="#cccccc"
+        offset="50%" /><stop
+        id="stop239499"
+        stop-opacity="1"
+        stop-color="#000000"
+        offset="100%" /></linearGradient><path
+        stroke-miterlimit="2"
+        d="m 150.41379,100 c 0,-35.986179 -22.71938,-58.042225 -59.534739,-58.042225 H 60.531258 c -5.970058,0 -10.945106,4.975048 -10.945106,10.945106 v 94.194239 c 0,5.97006 4.975048,10.94511 10.945106,10.94511 6.135893,0 11.110941,-4.97505 11.110941,-10.94511 V 63.184647 h 19.236852 c 24.875239,0 37.644529,12.76929 37.644529,36.815353 0,9.61843 -2.81919,18.07601 -7.79424,24.2119 l -3.8142,4.31171 c -4.64338,4.64338 -4.47755,10.94511 -1.16085,14.92515 3.98004,4.64337 10.94511,5.14088 15.58849,1.32668 C 143.61456,134.32783 150.41379,117.41267 150.41379,100 Z m -67.826485,47.09712 c 0,5.97006 4.975048,10.94511 10.945105,10.94511 6.135893,0 11.11094,-4.97505 11.11094,-10.94511 0,-6.13589 -4.975047,-11.11094 -11.11094,-11.11094 -5.970057,0 -10.945105,4.97505 -10.945105,11.11094 z"
+        style="font-style:normal;font-weight:400;font-size:72px;line-height:1;font-family:'Brandmark Dots 1 Color';font-variant-ligatures:normal;text-align:center;text-anchor:middle;fill:#f57314;stroke:#f57314;stroke-width:3.91554713;stroke-linejoin:miter;stroke-miterlimit:2"
+        id="path239526" /></svg>
