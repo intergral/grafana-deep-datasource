@@ -123,7 +123,7 @@ type queryModel struct {
 
 func (d *DeepDatasource) queryTracepoint(_ context.Context, pCtx backend.PluginContext, query backend.DataQuery) backend.DataResponse {
 
-	url := fmt.Sprintf("%v/tracepoints/api/tracepoints", pCtx.DataSourceInstanceSettings.URL)
+	url := fmt.Sprintf("%v/api/tracepoints", pCtx.DataSourceInstanceSettings.URL)
 
 	request, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {

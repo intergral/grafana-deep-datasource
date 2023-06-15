@@ -278,7 +278,7 @@ export class DeepDataSource extends DataSourceWithBackend<DeepQuery, DeepDatasou
 
   handleCreateTracepoint(appliedQuery: DeepQuery): Observable<Record<string, any>> {
     return getBackendSrv().fetch({
-      url: `${this.instanceSettings.url}/tracepoints/api/tracepoints`,
+      url: `${this.instanceSettings.url}/api/tracepoints`,
       method: 'post',
       data: {
         Tracepoint: {
@@ -295,7 +295,7 @@ export class DeepDataSource extends DataSourceWithBackend<DeepQuery, DeepDatasou
   }
 
   handleDeleteTracepoint(appliedQuery: DeepQuery): Observable<Record<string, any>> {
-    return this._request(`/tracepoints/api/tracepoints/${appliedQuery.query}`, undefined, { method: 'delete' });
+    return this._request(`/api/tracepoints/${appliedQuery.query}`, undefined, { method: 'delete' });
   }
 
   private parseTargeting(targeting: string | undefined) {

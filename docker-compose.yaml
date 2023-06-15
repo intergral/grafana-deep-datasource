@@ -6,7 +6,7 @@ services:
     build:
       context: ./.config
       args:
-        grafana_version: ${GRAFANA_VERSION:-9.3.8}
+        grafana_version: ${GRAFANA_VERSION:-10.0.0}
         grafana_image: ${GRAFANA_IMAGE:-grafana-oss}
     ports:
       - '3000:3000' # this needs to be 3000 for e2e tests

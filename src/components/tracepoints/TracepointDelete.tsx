@@ -18,11 +18,13 @@
 import { Props } from '../QueryEditor';
 import { Button, HorizontalGroup, InlineField, InlineFieldRow, InlineLabel, Input } from '@grafana/ui';
 import React, { useState } from 'react';
-import { isValidID } from '../../Utils';
+import { isValidTracepointID } from '../../Utils';
 import { firstValueFrom } from 'rxjs';
 
 export const TracepointDelete = ({ datasource, query, onChange, onRunQuery }: Props) => {
-  const [inputErrors, setInputErrors] = useState<{ [key: string]: boolean }>({});
+  const [inputErrors, setInputErrors] = useState<{ [key: string]: boolean }>({
+      tpid: !isValidTracepointID(query.query)
+  });
   const [isLoading, setLoading] = useState<boolean>(false);
 
   const onKeyDown = (keyEvent: React.KeyboardEvent) => {
@@ -43,7 +45,7 @@ export const TracepointDelete = ({ datasource, query, onChange, onRunQuery }: Pr
         <InlineField
           label="Tracepoint ID"
           invalid={inputErrors.tpid}
-          labelWidth={14}
+          labelWidth={20}
           grow
           tooltip="The ID of the tracepoint to delete"
         >
@@ -53,10 +55,10 @@ export const TracepointDelete = ({ datasource, query, onChange, onRunQuery }: Pr
             placeholder={`47c5f46d-e1d0-4a67-9941-db8552147e4f`}
             onChange={(v) => {
               let value = v.currentTarget.value;
-              if (value && isValidID(value)) {
-                setInputErrors({ ...inputErrors, tpid: true });
-              } else {
+              if (value && isValidTracepointID(value)) {
                 setInputErrors({ ...inputErrors, tpid: false });
+              } else {
+                setInputErrors({ ...inputErrors, tpid: true });
               }
 
               onChange({
@@ -70,6 +72,7 @@ export const TracepointDelete = ({ datasource, query, onChange, onRunQuery }: Pr
       </InlineFieldRow>
       <HorizontalGroup justify={'flex-end'}>
         <Button
+          disabled={inputErrors.tpid}
           icon={isLoading ? 'fa fa-spinner' : undefined}
           onClick={async () => {
             setLoading(true);

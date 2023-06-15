@@ -31,7 +31,7 @@
     "updated": "%TODAY%"
   },
   "dependencies": {
-    "grafanaDependency": "^9.3.8",
+    "grafanaDependency": "^10.0.0",
     "plugins": [
       {
         "id": "intergral-deep-panel",

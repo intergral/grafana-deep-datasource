@@ -27,7 +27,10 @@ export function serializeParams(data: Record<string, any>): string {
     .join('&');
 }
 
-export function isValidID(id: string): boolean {
-  const hexOnlyRegex = /^[0-9A-Fa-f]*$/;
-  return !!id.trim().match(hexOnlyRegex);
+export function isValidTracepointID(id: string): boolean {
+    if (!id || id.trim() === '' || id.length != 36) {
+        return false
+    }
+    const hexOnlyRegex = /^[0-9A-Fa-f]{8}-([0-9A-Fa-f]{4}-){3}[0-9A-Fa-f]{12}$/;
+    return !!id.trim().match(hexOnlyRegex);
 }
