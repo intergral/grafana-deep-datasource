@@ -45,3 +45,4 @@ COPY --from=deep /var/lib/grafana/plugins/ /var/lib/grafana/plugins/
 
 # continnue with your build steps
 ```
+
