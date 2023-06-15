@@ -37,7 +37,7 @@
         "id": "intergral-deep-panel",
         "name": "Deep Panel",
         "type": "panel",
-        "version": "0.0.1"
+        "version": "0.0.3"
       }
     ]
   }
