@@ -256,11 +256,8 @@ func snapshotToFrame(snap *deep_tp.Snapshot) (*data.Frame, error) {
 			data.NewField("Resource", nil, []json.RawMessage{}),
 		},
 		Meta: &data.FrameMeta{
-			PreferredVisualization: "plugin",
-			Custom: map[string]interface{}{
-				"pluginID": "intergral-deep-panel",
-				"title":    fmt.Sprintf("Snapshot: %v:%v", snap.Tracepoint.Path, snap.Tracepoint.LineNumber),
-			},
+			PreferredVisualization:         "table",
+			PreferredVisualizationPluginID: "intergral-deep-panel",
 		},
 	}
 
