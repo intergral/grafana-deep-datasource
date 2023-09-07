@@ -1,5 +1,52 @@
-# Changelog
+<!-- 1.0.0 Start -->
+# 1.0.0 (07/09/2023)
 
-## 1.0.0 (Unreleased)
+ - **[CHANGE]**: update to version 10 of grafana sdks [#8](https://github.com/intergral/deep/pull/8) [@Umaaz](https://github.com/Umaaz)
 
-Initial release.
+<!-- 1.0.0 END -->
+<!-- 0.0.7 Start -->
+# 0.0.7 (15/06/2023)
+
+ - **[CHANGE]**: use dev branch of grafana go sdk [#8](https://github.com/intergral/deep/pull/8) [@Umaaz](https://github.com/Umaaz)
+
+<!-- 0.0.7 END -->
+
+<!-- 0.0.6 Start -->
+# 0.0.6 (29/06/2023)
+
+ - **[CHANGE]**: remove plugin dependency, doesn't work for non marketplace plugins [#6](https://github.com/intergral/deep/pull/6) [@Umaaz](https://github.com/Umaaz)
+
+<!-- 0.0.6 END -->
+
+<!-- 0.0.5 Start -->
+# 0.0.5 (19/06/2023)
+
+ - **[ENHANCEMENT]**: improve builds [#4](https://github.com/intergral/deep/pull/4) [@Umaaz](https://github.com/Umaaz)
+
+<!-- 0.0.5 END -->
+
+<!-- 0.0.4 Start -->
+# 0.0.4 (15/06/2023)
+
+- **[BUGFIX]**: fix urls to support distributed mode services [@Umaaz](https://github.com/Umaaz) 
+- **[BUGFIX]**: disable delete button when invalid id is given [@Umaaz](https://github.com/Umaaz)
+
+<!-- 0.0.4 END -->
+
+<!-- 0.0.3 Start -->
+# 0.0.3 (09/06/2023)
+
+ - Initial release
+
+<!-- 0.0.3 END -->
+
+<!-- 0.1.1 Start -->
+<!-- Template START
+# 0.1.1 (16/06/2023)
+
+- **[CHANGE]**: description [#PRid](https://github.com/intergral/deep/pull/8) [@user](https://github.com/)
+- **[FEATURE]**: description [#PRid](https://github.com/intergral/deep/pull/) [@user](https://github.com/)
+- **[ENHANCEMENT]**: description [#PRid](https://github.com/intergral/deep/pull/) [@user](https://github.com/)
+- **[BUGFIX]**: description [#PRid](https://github.com/intergral/deep/pull/) [@user](https://github.com/)
+Template END -->
+<!-- 0.1.1 END -->
