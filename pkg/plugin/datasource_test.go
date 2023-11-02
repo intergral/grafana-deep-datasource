@@ -19,27 +19,46 @@ package plugin
 
 import (
 	"context"
+	"fmt"
+	"net/http"
+	"net/http/httptest"
 	"testing"
 
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 )
 
-func TestQueryData(t *testing.T) {
-	ds := DeepDatasource{}
+func TestQueryByIdNotFound(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(404)
+	}))
 
-	resp, err := ds.QueryData(
-		context.Background(),
+	settings := &backend.DataSourceInstanceSettings{
+		URL: ts.URL,
+	}
+	ds, err := NewDeepDatasource(*settings)
+
+	resp, err := ds.(*DeepDatasource).QueryData(context.Background(),
 		&backend.QueryDataRequest{
 			Queries: []backend.DataQuery{
-				{RefID: "A"},
+				{
+					RefID:     "A",
+					QueryType: "byid",
+					JSON:      []byte("{\"query\": \"123\"}"),
+				},
 			},
-		},
-	)
+			PluginContext: backend.PluginContext{
+				DataSourceInstanceSettings: settings,
+			},
+		})
 	if err != nil {
 		t.Error(err)
 	}
 
 	if len(resp.Responses) != 1 {
 		t.Fatal("QueryData must return a response")
+	}
+
+	if fmt.Sprintf("%s", resp.Responses["A"].Error) != "Cannot find snapshot with id: 123" {
+		t.Fatalf("Unexpected error from 404")
 	}
 }
