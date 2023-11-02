@@ -1,3 +1,7 @@
+# 1.0.1 (xx/xx/2023)
+
+- **[CHANGE]**: fix(module): correct module definition  [#11](https://github.com/intergral/deep/pull/11) [@Umaaz](https://github.com/Umaaz)
+<!-- 1.0.1 END -->
 <!-- 1.0.0 Start -->
 # 1.0.0 (07/09/2023)
 
