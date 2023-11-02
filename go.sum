@@ -142,6 +142,8 @@ github.com/hashicorp/yamux v0.1.1 h1:yrQxtgseBDrq9Y652vSRDvsKCJKOUD+GzTS4Y0Y8pvE
 github.com/hashicorp/yamux v0.1.1/go.mod h1:CtWFDAQgb7dxtzFs4tWbplKIe2jSi3+5vKbgIO0SLnQ=
 github.com/intergral/go-deep-proto v0.0.13 h1:kN9Ln+APJ1v1FWNDDUXtMrIS5N9ExCuJsaUmCPJlNi0=
 github.com/intergral/go-deep-proto v0.0.13/go.mod h1:kYiHIYAykVITDekpSAu1y9Z8Hr6OKpoYJGorm9uaeak=
+github.com/intergral/go-deep-proto v1.0.2 h1:ezpNLMusTjpQ2yvXUYT9aLmAL3s+/CRYdsMyiKN5ckg=
+github.com/intergral/go-deep-proto v1.0.2/go.mod h1:kYiHIYAykVITDekpSAu1y9Z8Hr6OKpoYJGorm9uaeak=
 github.com/invopop/yaml v0.1.0 h1:YW3WGUoJEXYfzWBjn00zIlrw7brGVD0fUKRYDPAPhrc=
 github.com/invopop/yaml v0.1.0/go.mod h1:2XuRLgs/ouIrW3XNzuNj7J3Nvu/Dig5MXvbCEdiBN3Q=
 github.com/jhump/protoreflect v1.6.0 h1:h5jfMVslIg6l29nsMs0D8Wj17RDVdNYti0vDN/PZZoE=

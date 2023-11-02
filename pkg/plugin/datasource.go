@@ -29,8 +29,8 @@ import (
 	"github.com/grafana/grafana-plugin-sdk-go/backend/instancemgmt"
 	"github.com/grafana/grafana-plugin-sdk-go/data"
 	"github.com/intergral/go-deep-proto/common/v1"
-	deep_pp "github.com/intergral/go-deep-proto/poll/v1"
-	deep_tp "github.com/intergral/go-deep-proto/tracepoint/v1"
+	deepPoll "github.com/intergral/go-deep-proto/poll/v1"
+	deepTp "github.com/intergral/go-deep-proto/tracepoint/v1"
 	"io"
 	"net/http"
 	"os"
@@ -147,7 +147,7 @@ func (d *DeepDatasource) queryTracepoint(_ context.Context, pCtx backend.PluginC
 		return backend.ErrDataResponse(backend.StatusBadRequest, fmt.Sprintf("read failed: %v", err.Error()))
 	}
 
-	var pollResponse deep_pp.PollResponse
+	var pollResponse deepPoll.PollResponse
 	err = proto.Unmarshal(all, &pollResponse)
 	if err != nil {
 		return backend.ErrDataResponse(backend.StatusBadRequest, fmt.Sprintf("response failed: %v", err.Error()))
@@ -198,7 +198,7 @@ func (d *DeepDatasource) queryByID(_ context.Context, pCtx backend.PluginContext
 		return backend.ErrDataResponse(backend.StatusBadRequest, fmt.Sprintf("read failed: %v", err.Error()))
 	}
 
-	var snap deep_tp.Snapshot
+	var snap deepTp.Snapshot
 	err = proto.Unmarshal(all, &snap)
 	if err != nil {
 		return backend.ErrDataResponse(backend.StatusBadRequest, fmt.Sprintf("response failed: %v", err.Error()))
@@ -215,7 +215,7 @@ func (d *DeepDatasource) queryByID(_ context.Context, pCtx backend.PluginContext
 	}
 }
 
-func pollResponseToFrame(pollResponse *deep_pp.PollResponse) (*data.Frame, error) {
+func pollResponseToFrame(pollResponse *deepPoll.PollResponse) (*data.Frame, error) {
 	frame := &data.Frame{
 		Name: "Tracepoint",
 		Fields: []*data.Field{
@@ -241,7 +241,7 @@ func pollResponseToFrame(pollResponse *deep_pp.PollResponse) (*data.Frame, error
 	return frame, nil
 }
 
-func snapshotToFrame(snap *deep_tp.Snapshot) (*data.Frame, error) {
+func snapshotToFrame(snap *deepTp.Snapshot) (*data.Frame, error) {
 	frame := &data.Frame{
 		Name: "Snapshot",
 		Fields: []*data.Field{

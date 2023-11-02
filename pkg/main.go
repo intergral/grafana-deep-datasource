@@ -20,9 +20,9 @@ package main
 import (
 	"os"
 
-	"github.com/asd/backend/pkg/plugin"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/datasource"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/log"
+	"github.com/intergral/grafana-deep-datasource/pkg/plugin"
 )
 
 func main() {
