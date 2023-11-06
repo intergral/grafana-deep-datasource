@@ -186,6 +186,11 @@ func (d *DeepDatasource) queryByID(_ context.Context, pCtx backend.PluginContext
 	if err != nil {
 		return backend.ErrDataResponse(backend.StatusBadRequest, fmt.Sprintf("request failed: %v", err.Error()))
 	}
+
+	if response.StatusCode == 404 {
+		return backend.ErrDataResponse(backend.StatusNotFound, fmt.Sprintf("Cannot find snapshot with id: %s", qm.Query))
+	}
+
 	defer func(Body io.ReadCloser) {
 		err := Body.Close()
 		if err != nil {
