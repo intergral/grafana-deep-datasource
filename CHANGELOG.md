@@ -1,3 +1,8 @@
+# 1.0.1 (xx/xx/2023)
+
+- **[BUGFIX]**: fix(query): handle 404 response from server #12 [#12](https://github.com/intergral/deep/pull/12) [@Umaaz](https://github.com/Umaaz)
+<!-- 1.0.1 END -->
+
 <!-- 1.0.0 Start -->
 # 1.0.0 (07/09/2023)
 
@@ -42,7 +47,7 @@
 
 <!-- 0.1.1 Start -->
 <!-- Template START
-# 0.1.1 (16/06/2023)
+# 1.0.0 (xx/xx/2023)
 
 - **[CHANGE]**: description [#PRid](https://github.com/intergral/deep/pull/8) [@user](https://github.com/)
 - **[FEATURE]**: description [#PRid](https://github.com/intergral/deep/pull/) [@user](https://github.com/)
