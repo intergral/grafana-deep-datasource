@@ -1,3 +1,7 @@
+![GitHub release (with filter)](https://img.shields.io/github/v/release/intergral/grafana-deep-datasource)
+[![CI](https://github.com/intergral/grafana-deep-datasource/actions/workflows/ci.yml/badge.svg)](https://github.com/intergral/grafana-deep-datasource/actions/workflows/ci.yml)
+[![Known Vulnerabilities](https://snyk.io/test/github/intergral/deep-java-client/badge.svg)](https://app.snyk.io/org/b.w.donnelly1/project/fac2666d-509e-4b7c-861a-8297f0fc9556)
+
 # Deep Datasource Plugin
 
 This is a plugin for [Grafana](https://grafana.com) that allows for connections to
