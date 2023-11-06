@@ -1,4 +1,4 @@
-module github.com/asd/backend
+module github.com/intergral/grafana-deep-datasource
 
 go 1.19
 
@@ -6,7 +6,7 @@ require (
 	github.com/go-kit/log v0.2.1
 	github.com/golang/protobuf v1.5.3
 	github.com/grafana/grafana-plugin-sdk-go v0.174.0
-	github.com/intergral/go-deep-proto v0.0.13
+	github.com/intergral/go-deep-proto v1.0.2
 )
 
 require (
