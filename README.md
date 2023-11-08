@@ -1,6 +1,6 @@
 ![GitHub release (with filter)](https://img.shields.io/github/v/release/intergral/grafana-deep-datasource)
 [![CI](https://github.com/intergral/grafana-deep-datasource/actions/workflows/ci.yml/badge.svg)](https://github.com/intergral/grafana-deep-datasource/actions/workflows/ci.yml)
-[![Known Vulnerabilities](https://snyk.io/test/github/intergral/deep-java-client/badge.svg)](https://app.snyk.io/org/b.w.donnelly1/project/fac2666d-509e-4b7c-861a-8297f0fc9556)
+[![Known Vulnerabilities](https://snyk.io/test/github/intergral/grafana-deep-datasource/badge.svg)](https://snyk.io/test/github/intergral/grafana-deep-datasource)
 
 # Deep Datasource Plugin
 
