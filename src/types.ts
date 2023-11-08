@@ -34,6 +34,7 @@ export interface DeepQuery extends DataQuery {
 export const DEFAULT_FIRE_COUNT = 1;
 
 export interface DeepTracepointCreateConfig {
+  log_msg?: string;
   targeting?: string;
   path: string;
   line_number: number;

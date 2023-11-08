@@ -188,6 +188,25 @@ export const TracepointCreate = ({ datasource, query, onChange, onRunQuery, onBl
           />
         </InlineField>
       </InlineFieldRow>
+      <InlineFieldRow>
+        <InlineField label="Log Message" labelWidth={20} grow tooltip="Log Message to inject at Tracepoint.">
+          <Input
+              id={"logmsg"}
+              placeholder={'Use {} to evaluate expressions.'}
+              value={query.tpCreate?.log_msg ?? ''}
+              type={"text"}
+              onChange={(v)=> {
+                  onChange( {
+                      ...query,
+                      tpCreate: {
+                          ...query.tpCreate,
+                          log_msg: v.currentTarget.value
+                      }
+                  })
+              }}
+          />
+        </InlineField>
+      </InlineFieldRow>
       <HorizontalGroup justify={'flex-end'}>
         <Button
           disabled={anyError()}

@@ -232,7 +232,8 @@ func pollResponseToFrame(pollResponse *deepPoll.PollResponse) (*data.Frame, erro
 			data.NewField("Targeting", nil, []json.RawMessage{}),
 		},
 		Meta: &data.FrameMeta{
-			PreferredVisualization: "table",
+			PreferredVisualization:         "table",
+			PreferredVisualizationPluginID: "intergral-deep-tracepoint-panel",
 		},
 	}
 
@@ -259,6 +260,7 @@ func snapshotToFrame(snap *deepTp.Snapshot) (*data.Frame, error) {
 			data.NewField("Attributes", nil, []json.RawMessage{}),
 			data.NewField("DurationNanos", nil, []uint64{}),
 			data.NewField("Resource", nil, []json.RawMessage{}),
+			data.NewField("LogMsg", nil, []*string{}),
 		},
 		Meta: &data.FrameMeta{
 			PreferredVisualization:         "table",
@@ -284,6 +286,7 @@ func snapshotToFrame(snap *deepTp.Snapshot) (*data.Frame, error) {
 		json.RawMessage(attributesJson),
 		snap.DurationNanos,
 		json.RawMessage(resourceJson),
+		snap.LogMsg,
 	)
 
 	return frame, nil
