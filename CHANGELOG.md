@@ -1,9 +1,10 @@
 <!-- 1.0.1 Start -->
 # 1.0.1 (xx/xx/2023)
 
-- **[CHANGE]**: fix(module): correct module definition  [#11](https://github.com/intergral/deep/pull/11) [@Umaaz](https://github.com/Umaaz)
+- **[CHANGE]**: update to grafana 10.2.0 [#14](https://github.com/intergral/deep/pull/14) [@Umaaz](https://github.com/Umaaz)
+- **[CHANGE]**: correct go module definition  [#11](https://github.com/intergral/deep/pull/11) [@Umaaz](https://github.com/Umaaz)
 - **[FEATURE]**: add support to create tracepoints with log messages [#15](https://github.com/intergral/deep/pull/15) [@Umaaz](https://github.com/Umaaz)
-- **[BUGFIX]**: fix(query): handle 404 response from server #12 [#12](https://github.com/intergral/deep/pull/12) [@Umaaz](https://github.com/Umaaz)
+- **[BUGFIX]**: handle 404 response from server [#12](https://github.com/intergral/deep/pull/12) [@Umaaz](https://github.com/Umaaz)
 
 <!-- 1.0.1 END -->
 

@@ -9,10 +9,10 @@ WORKDIR /root
 RUN apt -y update
 RUN apt -y install git build-essential
 
-RUN curl -L https://golang.org/dl/go1.18.linux-amd64.tar.gz > go1.18.linux-amd64.tar.gz
+RUN curl -L https://golang.org/dl/go1.20.linux-amd64.tar.gz > go1.20.linux-amd64.tar.gz
 
 RUN rm -rf /usr/local/go && \
-    tar -C /usr/local -xzf go1.18.linux-amd64.tar.gz
+    tar -C /usr/local -xzf go1.20.linux-amd64.tar.gz
 
 RUN touch README; printf "~~~~~~ START THE DLV SERVER WITH THIS COMMAND BEFORE RUNNING IDE DEBUGGER ~~~~~~ \r\nmage debugger\r\n\r\n" >> README
 

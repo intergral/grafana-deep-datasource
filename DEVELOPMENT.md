@@ -2,6 +2,23 @@
 
 Here we outline how to run and build the plugin.
 
+### Developing with panel plugin
+
+To develop this plugin with other dev plugins. Edit the [docker-compose.yml](./docker-compose.yaml) to add the mount for
+the extra plugins.
+
+For example:
+
+```yaml
+
+    volumes:
+      - ./:/root/dev
+      # Add this volumne to mount the dev output of the grafana-deep-panel to the docker
+      - ~/repo/github/intergral/grafana-deep-panel/dist:/var/lib/grafana/plugins/grafana-deep-panel
+      - ./dist:/var/lib/grafana/plugins/intergral-deep-datasource
+      - ./provisioning:/etc/grafana/provisioning
+```
+
 ### Backend Debug
 
 1. Run server
@@ -18,7 +35,6 @@ Here we outline how to run and build the plugin.
 
 3. Start Delve
    ```bash
-   cd /root/dev
    mage debugger
    ```
 4. Connect Idea by running 'Docker Debug'
