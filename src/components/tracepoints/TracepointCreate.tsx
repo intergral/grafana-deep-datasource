@@ -241,10 +241,9 @@ export const TracepointCreate = ({datasource, query, onChange, onRunQuery, onBlu
                     <div className={styles.watchGroup}>
                         <VerticalGroup>
                             {query.tpCreate.watches.map((watch, index) => {
-                                return <div className={styles.watchLine}>
+                                return <div className={styles.watchLine} key={index}>
                                     <Input
                                         className={styles.watchInput}
-                                        key={index}
                                         value={watch}
                                         type={"text"}
                                         onChange={event => {
