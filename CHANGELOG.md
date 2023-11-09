@@ -1,5 +1,5 @@
 <!-- 1.0.1 Start -->
-# 1.0.1 (xx/xx/2023)
+# 1.0.1 (09/11/2023)
 
 - **[CHANGE]**: update to grafana 10.2.0 [#14](https://github.com/intergral/deep/pull/14) [@Umaaz](https://github.com/Umaaz)
 - **[CHANGE]**: correct go module definition  [#11](https://github.com/intergral/deep/pull/11) [@Umaaz](https://github.com/Umaaz)
