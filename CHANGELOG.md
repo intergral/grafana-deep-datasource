@@ -1,7 +1,7 @@
 <!-- 1.0.2 Start -->
 # 1.0.2 (10/11/2023)
 
-- **[BUGFIX]**: handle case when creating tracepoint with no watches [#20](https://github.com/intergral/deep/pull/20) [@Umaaz](https://github.com/Umaaz)
+- **[BUGFIX]**: handle case when creating tracepoint with no watches [#22](https://github.com/intergral/deep/pull/22) [@Umaaz](https://github.com/Umaaz)
 
 <!-- 1.0.2 END -->
 
