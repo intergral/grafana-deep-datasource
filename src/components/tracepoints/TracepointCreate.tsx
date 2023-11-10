@@ -240,26 +240,30 @@ export const TracepointCreate = ({datasource, query, onChange, onRunQuery, onBlu
                     </InlineLabel>
                     <div className={styles.watchGroup}>
                         <VerticalGroup>
-                            {query.tpCreate.watches.map((watch, index) => {
+                            {(query.tpCreate?.watches ?? []).map((watch, index) => {
                                 return <div className={styles.watchLine} key={index}>
                                     <Input
                                         className={styles.watchInput}
                                         value={watch}
                                         type={"text"}
                                         onChange={event => {
+                                            query.tpCreate = {
+                                                ...query.tpCreate
+                                            }
+                                            query.tpCreate.watches = query.tpCreate?.watches ?? []
                                             query.tpCreate.watches[index] = event.currentTarget.value
                                             onChange({
                                                 ...query,
                                             })
                                         }}/>
                                     <span className={styles.watchButton}>
-                                    <IconButton name={"trash-alt"} aria-label={"delete"} onClick={() => {
-                                        query.tpCreate.watches.splice(index, 1);
-                                        onChange({
-                                            ...query,
-                                        })
-                                    }}/>
-                                </span>
+                                        <IconButton name={"trash-alt"} aria-label={"delete"} onClick={() => {
+                                            query.tpCreate.watches.splice(index, 1);
+                                            onChange({
+                                                ...query,
+                                            })
+                                        }}/>
+                                    </span>
                                 </div>
                             })}
                         </VerticalGroup>
@@ -274,13 +278,17 @@ export const TracepointCreate = ({datasource, query, onChange, onRunQuery, onBlu
                                 setNewWatch(event.currentTarget.value)
                             }}/>
                         <span className={styles.watchButton}>
-                                    <IconButton name={"plus"} aria-label={"Create"} onClick={() => {
-                                        query.tpCreate.watches.push(newWatch)
-                                        onChange({
-                                            ...query,
-                                        })
-                                    }}/>
-                                </span>
+                            <IconButton name={"plus"} aria-label={"Create"} onClick={() => {
+                                query.tpCreate = {
+                                    ...query.tpCreate
+                                }
+                                query.tpCreate.watches = query.tpCreate?.watches ?? []
+                                query.tpCreate.watches.push(newWatch)
+                                onChange({
+                                    ...query,
+                                })
+                            }}/>
+                        </span>
                     </div>
                 </div>
             </div>
