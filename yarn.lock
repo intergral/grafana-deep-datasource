@@ -1498,37 +1498,6 @@
   dependencies:
     tslib "^2.4.0"
 
-"@grafana/data@10.2.0":
-  version "10.2.0"
-  resolved "https://registry.yarnpkg.com/@grafana/data/-/data-10.2.0.tgz#116190f47f51f2eebd608bd5299d7ce278899bbe"
-  integrity sha512-MPUmkokQY7AWbJKVundp9AtTZdk4HqZHUCNvM1TFkTACUW9rVCi5fmmjwJQFLfTJ9JL2fkls8Z6S1l9Hd9ViTw==
-  dependencies:
-    "@braintree/sanitize-url" "6.0.2"
-    "@grafana/schema" "10.2.0"
-    "@types/d3-interpolate" "^3.0.0"
-    "@types/string-hash" "1.1.1"
-    d3-interpolate "3.0.1"
-    date-fns "2.30.0"
-    dompurify "^2.4.3"
-    eventemitter3 "5.0.1"
-    fast_array_intersect "1.1.0"
-    history "4.10.1"
-    lodash "4.17.21"
-    marked "5.1.1"
-    marked-mangle "1.1.0"
-    moment "2.29.4"
-    moment-timezone "0.5.43"
-    ol "7.4.0"
-    papaparse "5.4.1"
-    react-use "17.4.0"
-    regenerator-runtime "0.13.11"
-    rxjs "7.8.1"
-    string-hash "^1.1.3"
-    tinycolor2 "1.6.0"
-    tslib "2.6.0"
-    uplot "1.6.26"
-    xss "^1.0.14"
-
 "@grafana/data@10.2.2":
   version "10.2.2"
   resolved "https://registry.yarnpkg.com/@grafana/data/-/data-10.2.2.tgz#fca2c0029acf41e79f2e84e837758faa7519567b"
@@ -1564,6 +1533,15 @@
   version "10.2.0"
   resolved "https://registry.yarnpkg.com/@grafana/e2e-selectors/-/e2e-selectors-10.2.0.tgz#12110b75376cfeeeeb33d8bb57fca2b4119febb7"
   integrity sha512-mrYz7xri7H7TiYpDXQHeMHKMDzx2a9kIM0OklXhN1ZsQQSeYrh0+87EizyWeL0T7/d0OorLR4nq8zxVyVni8Bg==
+  dependencies:
+    "@grafana/tsconfig" "^1.2.0-rc1"
+    tslib "2.6.0"
+    typescript "4.8.4"
+
+"@grafana/e2e-selectors@10.2.2":
+  version "10.2.2"
+  resolved "https://registry.yarnpkg.com/@grafana/e2e-selectors/-/e2e-selectors-10.2.2.tgz#6707e3c6d501cb5e971daf052d6c17d99cbffd32"
+  integrity sha512-Ee/+AfjHSoEshdlm7WeLzWpTSLGuhsarx9Q3K9ar8NxfQmDYFHyp1dW3YGyWsxiDHdnEYt9jLw8wbvr5kM6iOA==
   dependencies:
     "@grafana/tsconfig" "^1.2.0-rc1"
     tslib "2.6.0"
@@ -1633,15 +1611,15 @@
     ua-parser-js "^1.0.32"
     web-vitals "^3.1.1"
 
-"@grafana/runtime@10.2.0":
-  version "10.2.0"
-  resolved "https://registry.yarnpkg.com/@grafana/runtime/-/runtime-10.2.0.tgz#7c8e1ab6f1d443dabd1de5205292b4e17732ab50"
-  integrity sha512-onhUvhzjYgBabGogJJk7uDJ4NfoPwfUXyxnnLANxP3MyLfe5M86ypYWztqXOARmX8dlm30TUEe4N+/evNyjHJw==
+"@grafana/runtime@10.2.2":
+  version "10.2.2"
+  resolved "https://registry.yarnpkg.com/@grafana/runtime/-/runtime-10.2.2.tgz#18cdd4f00798dccfa22c34d8685651eb4c1022a7"
+  integrity sha512-AYpGujmqFfB58oAQITI1o6P2+zSWWUSoWaXout8N+ZhcES9CSh5Tbr/LXFqu/gAC4oOsOIEM/N2Nje5wSRB8Iw==
   dependencies:
-    "@grafana/data" "10.2.0"
-    "@grafana/e2e-selectors" "10.2.0"
+    "@grafana/data" "10.2.2"
+    "@grafana/e2e-selectors" "10.2.2"
     "@grafana/faro-web-sdk" "1.2.1"
-    "@grafana/ui" "10.2.0"
+    "@grafana/ui" "10.2.2"
     history "4.10.1"
     lodash "4.17.21"
     rxjs "7.8.1"
@@ -1668,17 +1646,17 @@
   resolved "https://registry.yarnpkg.com/@grafana/tsconfig/-/tsconfig-1.2.0-rc1.tgz#10973c978ec95b0ea637511254b5f478bce04de7"
   integrity sha512-+SgQeBQ1pT6D/E3/dEdADqTrlgdIGuexUZ8EU+8KxQFKUeFeU7/3z/ayI2q/wpJ/Kr6WxBBNlrST6aOKia19Ag==
 
-"@grafana/ui@10.2.0":
-  version "10.2.0"
-  resolved "https://registry.yarnpkg.com/@grafana/ui/-/ui-10.2.0.tgz#99920ee490d52c014b28d61ca0d9d86294a15f41"
-  integrity sha512-RzvR053LVV8qYRrfFPMjzEeABwahVOeyQPXmU5vmYccPolQYXbc8wp149wjTf5xdUygqQunRADI6sAqgRpVrdA==
+"@grafana/ui@10.2.2":
+  version "10.2.2"
+  resolved "https://registry.yarnpkg.com/@grafana/ui/-/ui-10.2.2.tgz#3f3f2f20c29c301aa492398892081fcaa123c48f"
+  integrity sha512-45aZ9PL0lQeTSRfW916VWyTAm2u3a5bKihgiT8GX5a5Dm9+++xGwcOXVOwlIRIuLpWMJXqgg9MIrslZwfzCzhQ==
   dependencies:
     "@emotion/css" "11.11.2"
     "@emotion/react" "11.11.1"
-    "@grafana/data" "10.2.0"
-    "@grafana/e2e-selectors" "10.2.0"
+    "@grafana/data" "10.2.2"
+    "@grafana/e2e-selectors" "10.2.2"
     "@grafana/faro-web-sdk" "1.2.1"
-    "@grafana/schema" "10.2.0"
+    "@grafana/schema" "10.2.2"
     "@leeoniya/ufuzzy" "1.0.8"
     "@monaco-editor/react" "4.6.0"
     "@popperjs/core" "2.11.8"
@@ -1737,7 +1715,7 @@
     slate-react "0.22.10"
     tinycolor2 "1.6.0"
     tslib "2.6.0"
-    uplot "1.6.26"
+    uplot "1.6.27"
     uuid "9.0.0"
 
 "@humanwhocodes/config-array@^0.11.6":
@@ -9949,11 +9927,6 @@ update-browserslist-db@^1.0.13:
   dependencies:
     escalade "^3.1.1"
     picocolors "^1.0.0"
-
-uplot@1.6.26:
-  version "1.6.26"
-  resolved "https://registry.yarnpkg.com/uplot/-/uplot-1.6.26.tgz#a6012fd141ad4a71741c75af0c71283d0ade45a7"
-  integrity sha512-qN0mveL6UsP40TnHzHAJkUQvpfA3y8zSLXtXKVlJo/sLfj2+vjan/Z3g81MCZjy/hEDUFNtnLftPmETDA4s7Rg==
 
 uplot@1.6.27:
   version "1.6.27"
