@@ -37,7 +37,16 @@ export function FindByIDSearch({ datasource, query, onChange, onRunQuery }: Prop
   return (
     <>
       <div className={styles.container}>
-        <InlineLabel>Enter the ID of a snapshot to view the data.</InlineLabel>
+        <InlineLabel>
+          Enter the ID of a snapshot to view the data.
+          <a
+            rel="noreferrer"
+            target="_blank"
+            href="https://intergral.github.io/grafana-deep-datasource/explore/find_by_id/"
+          >
+            Documentation
+          </a>
+        </InlineLabel>
         <InlineFieldRow>
           <InlineField label="Find by ID" invalid={inputErrors.byid} grow tooltip="Find a single snapshot by ID">
             <Input
