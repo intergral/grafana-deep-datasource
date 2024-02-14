@@ -1,3 +1,12 @@
+<!-- main Start -->
+
+# main (unreleased)
+
+- **[FEATURE]**: Add support for metrics and traces [#34](https://github.com/intergral/deep/pull/34) [@Umaaz](https://github.com/Umaaz)
+- **[ENHANCEMENT]**: Improve the firecount input to make it easier to understand [#34](https://github.com/intergral/deep/pull/34) [@Umaaz](https://github.com/Umaaz)
+
+<!-- main END -->
+
 <!-- 1.0.2 Start -->
 
 # 1.0.2 (10/11/2023)
