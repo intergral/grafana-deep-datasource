@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-import {CoreApp, DataQueryRequest, DataQueryResponse, DataSourceInstanceSettings, ScopedVars} from '@grafana/data';
+import { CoreApp, DataQueryRequest, DataQueryResponse, DataSourceInstanceSettings, ScopedVars } from '@grafana/data';
 import {
   BackendSrvRequest,
   config,
@@ -26,11 +26,11 @@ import {
   TemplateSrv,
 } from '@grafana/runtime';
 
-import {DeepDatasourceOptions, DeepQuery, DEFAULT_FIRE_COUNT, DEFAULT_QUERY, SearchQueryParams} from '../types';
+import { DeepDatasourceOptions, DeepQuery, DEFAULT_FIRE_COUNT, DEFAULT_QUERY, SearchQueryParams } from '../types';
 import DeepLanguageProvider from './DeepLanguageProvider';
-import {catchError, lastValueFrom, map, merge, Observable, of} from 'rxjs';
-import {serializeParams} from 'Utils';
-import {groupBy, identity, pick, pickBy} from 'lodash';
+import { catchError, lastValueFrom, map, merge, Observable, of } from 'rxjs';
+import { serializeParams } from 'Utils';
+import { groupBy, identity, pick, pickBy } from 'lodash';
 import {
   createTableFrameFromDeepQlQuery,
   createTableFrameFromSearch,
@@ -286,7 +286,7 @@ export class DeepDataSource extends DataSourceWithBackend<DeepQuery, DeepDatasou
           line_number: appliedQuery.tpCreate.line_number,
           args: {
             fire_count: `${appliedQuery.tpCreate.fire_count ?? DEFAULT_FIRE_COUNT}`,
-            ...(appliedQuery.tpCreate.log_msg ? {"log_msg": appliedQuery.tpCreate.log_msg} : {})
+            ...(appliedQuery.tpCreate.log_msg ? { log_msg: appliedQuery.tpCreate.log_msg } : {}),
           },
           watches: appliedQuery.tpCreate.watches,
           targeting: this.parseTargeting(appliedQuery.tpCreate.targeting),

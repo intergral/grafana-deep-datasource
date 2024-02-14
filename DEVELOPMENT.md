@@ -10,13 +10,12 @@ the extra plugins.
 For example:
 
 ```yaml
-
-    volumes:
-      - ./:/root/dev
-      # Add this volumne to mount the dev output of the grafana-deep-panel to the docker
-      - ~/repo/github/intergral/grafana-deep-panel/dist:/var/lib/grafana/plugins/grafana-deep-panel
-      - ./dist:/var/lib/grafana/plugins/intergral-deep-datasource
-      - ./provisioning:/etc/grafana/provisioning
+volumes:
+  - ./:/root/dev
+  # Add this volumne to mount the dev output of the grafana-deep-panel to the docker
+  - ~/repo/github/intergral/grafana-deep-panel/dist:/var/lib/grafana/plugins/intergral-deep-panel
+  - ./dist:/var/lib/grafana/plugins/intergral-deep-datasource
+  - ./provisioning:/etc/grafana/provisioning
 ```
 
 ### Backend Debug
@@ -136,7 +135,7 @@ Before signing a plugin for the first time please consult the Grafana [plugin si
 
 1. Create a [Grafana Cloud account](https://grafana.com/signup).
 2. Make sure that the first part of the plugin ID matches the slug of your Grafana Cloud account.
-    - _You can find the plugin ID in the plugin.json file inside your plugin directory. For example, if your account slug is `acmecorp`, you need to prefix the plugin ID with `acmecorp-`._
+   - _You can find the plugin ID in the plugin.json file inside your plugin directory. For example, if your account slug is `acmecorp`, you need to prefix the plugin ID with `acmecorp-`._
 3. Create a Grafana Cloud API key with the `PluginPublisher` role.
 4. Keep a record of this API key as it will be required for signing a plugin
 
