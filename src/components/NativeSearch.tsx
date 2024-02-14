@@ -91,7 +91,6 @@ const NativeSearch = ({ datasource, query, onChange, onBlur, onRunQuery }: Props
 
   const [tagConfig, setTagConfig] = useState<string>(query.search);
 
-
   useEffect(() => {
     onChange({
       ...query,

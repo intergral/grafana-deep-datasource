@@ -31,15 +31,15 @@ jobs:
       - name: Build frontend
         run: yarn build
 
-# Disabled as we do not have any e2e tests yet
-#      - name: Start grafana docker
-#        run: yarn server -d
-#
-#      - name: Run e2e tests
-#        run: yarn e2e
-#
-#      - name: Stop grafana docker
-#        run: docker-compose down
+      # Disabled as we do not have any e2e tests yet
+      #      - name: Start grafana docker
+      #        run: yarn server -d
+      #
+      #      - name: Run e2e tests
+      #        run: yarn e2e
+      #
+      #      - name: Stop grafana docker
+      #        run: docker-compose down
 
       - name: Check for backend
         id: check-for-backend
