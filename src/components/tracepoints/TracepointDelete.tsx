@@ -23,7 +23,7 @@ import { firstValueFrom } from 'rxjs';
 
 export const TracepointDelete = ({ datasource, query, onChange, onRunQuery }: Props) => {
   const [inputErrors, setInputErrors] = useState<{ [key: string]: boolean }>({
-      tpid: !isValidTracepointID(query.query)
+    tpid: !isValidTracepointID(query.query),
   });
   const [isLoading, setLoading] = useState<boolean>(false);
 
