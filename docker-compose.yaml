@@ -18,4 +18,6 @@ services:
     volumes:
       - ./:/root/dev
       - ./dist:/var/lib/grafana/plugins/intergral-deep-datasource
+      - ~/repo/github/intergral/grafana-deep-panel/dist:/var/lib/grafana/plugins/intergral-deep-panel
+      - ~/repo/github/intergral/grafana-deep-tracepoint-panel/dist:/var/lib/grafana/plugins/grafana-deep-tracepoint-panel
       - ./provisioning:/etc/grafana/provisioning
