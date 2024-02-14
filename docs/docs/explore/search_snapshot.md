@@ -2,7 +2,7 @@
 
 Search can be used to search for snapshots that have been triggered. Using explore open the Deep datasource and select search.
 
-![img_1.png](img_1.png)
+![Search Snapshot](search_snapshot.png)
 
 Here you can enter a query to narrow down the search.
 
