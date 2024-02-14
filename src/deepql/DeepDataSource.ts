@@ -287,9 +287,17 @@ export class DeepDataSource extends DataSourceWithBackend<DeepQuery, DeepDatasou
           args: {
             fire_count: `${appliedQuery.tpCreate.fire_count ?? DEFAULT_FIRE_COUNT}`,
             ...(appliedQuery.tpCreate.log_msg ? { log_msg: appliedQuery.tpCreate.log_msg } : {}),
+            ...(appliedQuery.tpCreate.trace ? { span: appliedQuery.tpCreate.trace } : {}),
           },
-          watches: appliedQuery.tpCreate.watches,
+          watches: (appliedQuery.tpCreate.watches ?? []).map((watch) => watch.expression),
           targeting: this.parseTargeting(appliedQuery.tpCreate.targeting),
+          metrics: (appliedQuery.tpCreate?.metrics ?? []).map((metric) => {
+            return {
+              name: metric.name,
+              expression: metric.expression,
+              type: 'COUNTER',
+            };
+          }),
         },
       },
     });
