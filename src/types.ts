@@ -64,7 +64,11 @@ export const DEFAULT_QUERY: Partial<DeepQuery> = {};
  * These are options configured for each DataSource instance
  */
 export interface DeepDatasourceOptions extends DataSourceJsonData {
-  experimental: { deepql: boolean };
+  experimental: { deepql: boolean; tempo?: TempoSettings };
+}
+
+export interface TempoSettings {
+  datasource: string;
 }
 
 /**

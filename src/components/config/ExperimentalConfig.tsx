@@ -17,12 +17,14 @@
 import { InlineField, InlineFieldRow, InlineSwitch } from '@grafana/ui';
 import React from 'react';
 import { Props } from '../ConfigEditor';
-import { updateDatasourcePluginJsonDataOption } from '@grafana/data';
+import { DataSourceInstanceSettings, updateDatasourcePluginJsonDataOption } from '@grafana/data';
+import { ConfigSection } from '@grafana/experimental';
+import { DataSourcePicker } from '@grafana/runtime';
 
 export function ExperimentalSettings({ onOptionsChange, options }: Props) {
   return (
     <>
-      <div>
+      <ConfigSection title={'Experimental Settings'}>
         <InlineFieldRow>
           <InlineField tooltip="deepQL" label="Enable the deepQL search." labelWidth={26}>
             <InlineSwitch
@@ -37,7 +39,27 @@ export function ExperimentalSettings({ onOptionsChange, options }: Props) {
             />
           </InlineField>
         </InlineFieldRow>
-      </div>
+        <InlineFieldRow>
+          <InlineField tooltip="The Trace source for deep to check." label="Data source" labelWidth={26}>
+            <DataSourcePicker
+              inputId="deep-to-trace"
+              filter={(ds) => ds.type === 'tempo'}
+              current={options.jsonData.experimental?.tempo?.datasource}
+              noDefault={true}
+              width={40}
+              onChange={(ds: DataSourceInstanceSettings) =>
+                updateDatasourcePluginJsonDataOption({ onOptionsChange, options }, 'experimental', {
+                  ...options.jsonData.experimental,
+                  tempo: {
+                    ...options.jsonData.experimental.tempo,
+                    datasource: ds.uid,
+                  },
+                })
+              }
+            />
+          </InlineField>
+        </InlineFieldRow>
+      </ConfigSection>
     </>
   );
 }
