@@ -15,7 +15,8 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { DataQuery, DataSourceJsonData } from '@grafana/data';
+import { DataSourceJsonData } from '@grafana/data';
+import { DataQuery } from '@grafana/schema';
 
 export interface DeepQuery extends DataQuery {
   limit?: number;
@@ -34,12 +35,25 @@ export interface DeepQuery extends DataQuery {
 export const DEFAULT_FIRE_COUNT = 1;
 
 export interface DeepTracepointCreateConfig {
+  metrics: Metric[];
   log_msg?: string;
   targeting?: string;
   path: string;
   line_number: number;
   fire_count: number;
-  watches: string[];
+  watches: Watch[];
+  trace?: string;
+}
+
+export interface Watch {
+  id: string;
+  expression?: string;
+}
+
+export interface Metric {
+  id: string;
+  name?: string;
+  expression?: string;
 }
 
 export interface SearchQueryParams {
