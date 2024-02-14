@@ -26,6 +26,8 @@ jobs:
         run: yarn typecheck
       - name: Lint
         run: yarn lint
+      - name: Lint
+        run: prettier -c
       - name: Unit tests
         run: yarn test:ci
       - name: Build frontend
