@@ -1,3 +1,10 @@
+<!-- main Start -->
+# main (xx/xx/2024)
+
+- **[FEATURE]**: add links from snapshots to traces [#31](https://github.com/intergral/deep/pull/31) [@Umaaz](https://github.com/Umaaz)
+
+<!-- main END -->
+
 <!-- 1.0.2 Start -->
 # 1.0.2 (10/11/2023)
 
