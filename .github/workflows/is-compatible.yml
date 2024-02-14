@@ -17,6 +17,6 @@ jobs:
       - name: Compatibility check
         uses: grafana/plugin-actions/is-compatible@v1
         with:
-          module: "./src/module.ts"
-          comment-pr: "yes"
-          fail-if-incompatible: "no"
+          module: './src/module.ts'
+          comment-pr: 'yes'
+          fail-if-incompatible: 'no'
