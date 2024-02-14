@@ -33,7 +33,11 @@ export const TracepointList = ({ query, onChange, onRunQuery }: Props) => {
     <>
       <InlineLabel>
         Show the current configured tracepoints
-        <a rel="noreferrer" target="_blank" href="TODO/">
+        <a
+          rel="noreferrer"
+          target="_blank"
+          href="https://intergral.github.io/grafana-deep-datasource/explore/list_tracepoint/"
+        >
           Documentation
         </a>
       </InlineLabel>

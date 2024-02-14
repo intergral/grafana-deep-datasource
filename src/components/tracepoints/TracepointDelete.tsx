@@ -23,7 +23,7 @@ import { firstValueFrom } from 'rxjs';
 
 export const TracepointDelete = ({ datasource, query, onChange, onRunQuery }: Props) => {
   const [inputErrors, setInputErrors] = useState<{ [key: string]: boolean }>({
-      tpid: !isValidTracepointID(query.query)
+    tpid: !isValidTracepointID(query.query),
   });
   const [isLoading, setLoading] = useState<boolean>(false);
 
@@ -37,7 +37,11 @@ export const TracepointDelete = ({ datasource, query, onChange, onRunQuery }: Pr
     <>
       <InlineLabel>
         Enter a tracepoint id to delete the tracepoint
-        <a rel="noreferrer" target="_blank" href="TODO/">
+        <a
+          rel="noreferrer"
+          target="_blank"
+          href="https://intergral.github.io/grafana-deep-datasource/explore/delete_tracepoint/"
+        >
           Documentation
         </a>
       </InlineLabel>
