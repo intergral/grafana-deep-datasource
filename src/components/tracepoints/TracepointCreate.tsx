@@ -108,9 +108,9 @@ export const TracepointCreate = ({ datasource, query, onChange, onRunQuery, onBl
     { label: '10', value: 10 },
   ];
 
-  function spanFromOptions(spanOptions: { label: string; value: string }[], value: string) {
-    return spanOptions.filter((value1) => {
-      return value1.value == value;
+  function spanFromOptions(spanOptions: Array<{ label: string; value: string }>, value: string) {
+    return spanOptions.filter((option) => {
+      return option.value === value;
     })[0];
   }
 
@@ -244,12 +244,13 @@ export const TracepointCreate = ({ datasource, query, onChange, onRunQuery, onBl
             onCreateOption={(v) => {
               if (isValidFireCount(v)) {
                 setInputErrors({ ...inputErrors, firecount: false });
-                setCustomOptions([...customOptions, { label: v, value: parseInt(v) }]);
+                const valueInt = parseInt(v, 10);
+                setCustomOptions([...customOptions, { label: v, value: valueInt }]);
                 onChange({
                   ...query,
                   tpCreate: {
                     ...query.tpCreate,
-                    fire_count: parseInt(v),
+                    fire_count: valueInt,
                   },
                 });
               } else {
@@ -324,21 +325,21 @@ export const TracepointCreate = ({ datasource, query, onChange, onRunQuery, onBl
                   id: randomId(),
                 },
               ]
-            ).map((tag, i) => (
+            ).map((metric, i) => (
               <div key={i}>
                 <HorizontalGroup spacing={'xs'} width={'auto'}>
                   <Input
                     id={'metric'}
                     placeholder={'uuid_length'}
-                    value={tag.name}
+                    value={metric.name}
                     type={'text'}
                     onChange={(v) => {
                       onChange({
                         ...query,
                         tpCreate: {
                           ...query.tpCreate,
-                          metrics: (query.tpCreate?.metrics ?? [tag]).map((metric) => {
-                            if (metric.id == tag.id) {
+                          metrics: (query.tpCreate?.metrics ?? [metric]).map((metric) => {
+                            if (metric.id === metric.id) {
                               metric.name = v.currentTarget.value;
                             }
                             return metric;
@@ -351,15 +352,15 @@ export const TracepointCreate = ({ datasource, query, onChange, onRunQuery, onBl
                     <Input
                       id={'tag'}
                       placeholder={'len(uuid)'}
-                      value={tag.expression}
+                      value={metric.expression}
                       type={'text'}
                       onChange={(v) => {
                         onChange({
                           ...query,
                           tpCreate: {
                             ...query.tpCreate,
-                            metrics: (query.tpCreate?.metrics ?? [tag]).map((metric) => {
-                              if (metric.id == tag.id) {
+                            metrics: (query.tpCreate?.metrics ?? [metric]).map((metric) => {
+                              if (metric.id === metric.id) {
                                 metric.expression = v.currentTarget.value;
                               }
                               return metric;
@@ -369,16 +370,16 @@ export const TracepointCreate = ({ datasource, query, onChange, onRunQuery, onBl
                       }}
                     />
                   </span>
-                  {(tag.name || tag.expression || (query.tpCreate?.metrics ?? [tag]).length > 1) && (
+                  {(metric.name || metric.expression || (query.tpCreate?.metrics ?? [metric]).length > 1) && (
                     <AccessoryButton
                       aria-label="Remove metric"
                       variant="secondary"
                       icon="times"
-                      onClick={() => removeMetric(tag.id)}
+                      onClick={() => removeMetric(metric.id)}
                       tooltip="Remove metric"
                     />
                   )}
-                  {(tag.name || tag.expression) && i === (query.tpCreate?.metrics ?? [tag]).length - 1 && (
+                  {(metric.name || metric.expression) && i === (query.tpCreate?.metrics ?? [metric]).length - 1 && (
                     <span className={styles.addValue}>
                       <AccessoryButton
                         aria-label="Add metric"
