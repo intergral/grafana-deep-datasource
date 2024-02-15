@@ -65,7 +65,7 @@
     "@emotion/css": "^11.11.2",
     "@grafana/data": "10.2.3",
     "@grafana/experimental": "^1.7.10",
-    "@grafana/runtime": "10.2.3",
+    "@grafana/runtime": "10.3.1",
     "@grafana/ui": "10.2.3",
     "prismjs": "^1.29.0",
     "react": "17.0.2",
