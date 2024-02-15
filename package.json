@@ -16,7 +16,8 @@
     "e2e:update": "yarn cypress install && yarn grafana-e2e run --update-screenshots",
     "server": "docker compose up --build",
     "sign": "npx --yes @grafana/sign-plugin@latest --rootUrls=http://localhost:3000",
-    "zip": "./build_zip.sh"
+    "zip": "./build_zip.sh",
+    "docs": "mkdocs serve -f docs/mkdocs.yml"
   },
   "author": "Intergral GmbH",
   "license": "AGPL-3.0",
