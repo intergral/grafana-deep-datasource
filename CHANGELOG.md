@@ -3,7 +3,8 @@
 # main (unreleased)
 
 - **[FEATURE]**: Add support for metrics and traces [#34](https://github.com/intergral/deep/pull/34) [@Umaaz](https://github.com/Umaaz)
-- **[ENHANCEMENT]**: Improve the firecount input to make it easier to understand [#34](https://github.com/intergral/deep/pull/34) [@Umaaz](https://github.com/Umaaz)
+- **[ENHANCEMENT]**: Improve the fire count input to make it easier to understand [#34](https://github.com/intergral/deep/pull/34) [@Umaaz](https://github.com/Umaaz)
+- **[BUGFIX]**: Correct links for documentation on query builder [#33](https://github.com/intergral/deep/pull/33) [@Umaaz](https://github.com/Umaaz)
 
 <!-- main END -->
 
