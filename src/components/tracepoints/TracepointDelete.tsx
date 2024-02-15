@@ -37,7 +37,11 @@ export const TracepointDelete = ({ datasource, query, onChange, onRunQuery }: Pr
     <>
       <InlineLabel>
         Enter a tracepoint id to delete the tracepoint
-        <a rel="noreferrer" target="_blank" href="TODO/">
+        <a
+          rel="noreferrer"
+          target="_blank"
+          href="https://intergral.github.io/grafana-deep-datasource/explore/delete_tracepoint/"
+        >
           Documentation
         </a>
       </InlineLabel>

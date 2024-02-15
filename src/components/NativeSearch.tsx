@@ -20,7 +20,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { GrafanaTheme2, SelectableValue, toOption } from '@grafana/data';
 import { FetchError, getTemplateSrv, isFetchError } from '@grafana/runtime';
-import { Alert, fuzzyMatch, InlineField, InlineFieldRow, Input, Select, useStyles2 } from '@grafana/ui';
+import { Alert, fuzzyMatch, InlineField, InlineFieldRow, InlineLabel, Input, Select, useStyles2 } from '@grafana/ui';
 
 import { TagsField } from './TagsField/TagsField';
 import { Props } from './QueryEditor';
@@ -101,6 +101,16 @@ const NativeSearch = ({ datasource, query, onChange, onBlur, onRunQuery }: Props
   return (
     <>
       <div className={styles.container}>
+        <InlineLabel className={styles.label}>
+          Search for snapshots.
+          <a
+            rel="noreferrer"
+            target="_blank"
+            href="https://intergral.github.io/grafana-deep-datasource/explore/search_snapshot/"
+          >
+            Documentation
+          </a>
+        </InlineLabel>
         <InlineFieldRow>
           <InlineField label="Service Name" labelWidth={14} grow>
             <Select
@@ -180,8 +190,9 @@ const NativeSearch = ({ datasource, query, onChange, onBlur, onRunQuery }: Props
 export default NativeSearch;
 
 const getStyles = (theme: GrafanaTheme2) => ({
-  container: css`
-    max-width: 500px;
+  container: css``,
+  label: css`
+    width: inherit;
   `,
   alert: css`
     max-width: 75ch;
