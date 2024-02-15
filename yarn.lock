@@ -1529,6 +1529,37 @@
     uplot "1.6.27"
     xss "^1.0.14"
 
+"@grafana/data@10.3.1":
+  version "10.3.1"
+  resolved "https://registry.yarnpkg.com/@grafana/data/-/data-10.3.1.tgz#9858d49b608485daad948b3012816762025c4924"
+  integrity sha512-Sok3UVhaXmSLaGyehx8gsCh6jVI+8GH4UiMtvGN2mDvN7ogTOdyBHVqxiYMFwkWrzPOJ0d8dJyG1qwRRr7M8LQ==
+  dependencies:
+    "@braintree/sanitize-url" "6.0.2"
+    "@grafana/schema" "10.3.1"
+    "@types/d3-interpolate" "^3.0.0"
+    "@types/string-hash" "1.1.1"
+    d3-interpolate "3.0.1"
+    date-fns "2.30.0"
+    dompurify "^2.4.3"
+    eventemitter3 "5.0.1"
+    fast_array_intersect "1.1.0"
+    history "4.10.1"
+    lodash "4.17.21"
+    marked "5.1.1"
+    marked-mangle "1.1.0"
+    moment "2.29.4"
+    moment-timezone "0.5.43"
+    ol "7.4.0"
+    papaparse "5.4.1"
+    react-use "17.4.0"
+    regenerator-runtime "0.14.0"
+    rxjs "7.8.1"
+    string-hash "^1.1.3"
+    tinycolor2 "1.6.0"
+    tslib "2.6.0"
+    uplot "1.6.28"
+    xss "^1.0.14"
+
 "@grafana/e2e-selectors@10.2.0":
   version "10.2.0"
   resolved "https://registry.yarnpkg.com/@grafana/e2e-selectors/-/e2e-selectors-10.2.0.tgz#12110b75376cfeeeeb33d8bb57fca2b4119febb7"
@@ -1652,6 +1683,13 @@
   version "10.2.3"
   resolved "https://registry.yarnpkg.com/@grafana/schema/-/schema-10.2.3.tgz#a33db1c890da6d7d4cbb9d749ee3a070a1ba7d2b"
   integrity sha512-D/fcdvRy58uBlw6JljItgzzh+ZCazxRgZm61RZ6wQjuk810sW+P9D9J5aDy8z5qWAzDrnroB5/+uMiNwdk4CBA==
+  dependencies:
+    tslib "2.6.0"
+
+"@grafana/schema@10.3.1":
+  version "10.3.1"
+  resolved "https://registry.yarnpkg.com/@grafana/schema/-/schema-10.3.1.tgz#c8b43c064b13dfb02e0a4fc604593d370a412845"
+  integrity sha512-newt0qGm3ZNQxOFApYBzyTLh0HTslWEfkp+DiKLK/W0Fyxl+RlSYf99gh7gv+/QlIa0wpQRaGIknSlI85Ho7yA==
   dependencies:
     tslib "2.6.0"
 
@@ -9994,6 +10032,11 @@ uplot@1.6.27:
   version "1.6.27"
   resolved "https://registry.yarnpkg.com/uplot/-/uplot-1.6.27.tgz#d282b98ea17f8980eadb2b7d634a8b11dd4521aa"
   integrity sha512-78U4ss5YeU65kQkOC/QAKiyII+4uo+TYUJJKvuxRzeSpk/s5sjpY1TL0agkmhHBBShpvLtmbHIEiM7+C5lBULg==
+
+uplot@1.6.28:
+  version "1.6.28"
+  resolved "https://registry.yarnpkg.com/uplot/-/uplot-1.6.28.tgz#bce4fe5e65e4d3e7f2c2288ad580b4fffbbc68cc"
+  integrity sha512-6AQ/Hu2ZvwF1P6PtIELdWKFml8Vvf3PUqrkVndL4A1+s/0loHwXfsk3yMwy4WGkRAt0MAMpf0uKLa9h0Yt3miw==
 
 uri-js@^4.2.2:
   version "4.4.1"
