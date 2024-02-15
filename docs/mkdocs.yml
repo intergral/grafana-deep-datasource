@@ -30,14 +30,13 @@ markdown_extensions:
   - pymdownx.snippets
   - pymdownx.superfences
 
-
 plugins:
   - search:
   - spellcheck:
       backends: # the backends you want to use
-        - symspellpy  # as strings
+        - symspellpy # as strings
         - codespell: # or nested configs
-            dictionaries: [ clear, code, names  ]
+            dictionaries: [clear, code, names]
 
       # known_words can also be a list of words
       known_words: known_words.txt
