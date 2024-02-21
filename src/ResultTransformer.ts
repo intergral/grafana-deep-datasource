@@ -16,13 +16,7 @@
  */
 
 import { DeepDatasourceOptions, SnapshotSearchMetadata, SnapshotTableData } from './types';
-import {
-  DataFrame,
-  DataQueryResponse,
-  DataSourceInstanceSettings,
-  dateTimeFormat,
-  FieldType,
-} from '@grafana/data';
+import { DataFrame, DataQueryResponse, DataSourceInstanceSettings, dateTimeFormat, FieldType } from '@grafana/data';
 
 export function createTableFrameFromDeepQlQuery(
   data: SnapshotSearchMetadata[],
@@ -63,7 +57,7 @@ export function createTableFrameFromDeepQlQuery(
     meta: {
       preferredVisualisationType: 'table',
     },
-    length: 4
+    length: 4,
   };
 
   if (!data?.length) {
@@ -134,7 +128,7 @@ export function createTableFrameFromSearch(
     meta: {
       preferredVisualisationType: 'table',
     },
-    length: 4
+    length: 4,
   };
   if (!data?.length) {
     return frame;

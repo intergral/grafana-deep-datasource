@@ -98,7 +98,7 @@ export const TracepointCreate = ({ datasource, query, onChange, onRunQuery, onBl
   }, [targeting]); // eslint-disable-line react-hooks/exhaustive-deps
 
   function anyError() {
-    const {metrics, ...rest} = inputErrors
+    const { metrics, ...rest } = inputErrors;
     return Object.values(rest).some((v) => v) || metrics.some((v) => v);
   }
 
