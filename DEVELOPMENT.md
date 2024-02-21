@@ -166,7 +166,6 @@ Below you can find source code for existing app plugins and other related docume
 - [Plugin.json documentation](https://grafana.com/docs/grafana/latest/developers/plugins/metadata/)
 - [How to sign a plugin?](https://grafana.com/docs/grafana/latest/developers/plugins/sign-a-plugin/)
 
-
 ## Updating plugin
 
 Use the cli to update the plugin project:
