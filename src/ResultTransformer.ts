@@ -16,24 +16,18 @@
  */
 
 import { DeepDatasourceOptions, SnapshotSearchMetadata, SnapshotTableData } from './types';
-import {
-  DataFrame,
-  DataQueryResponse,
-  DataSourceInstanceSettings,
-  dateTimeFormat,
-  FieldType,
-  MutableDataFrame,
-} from '@grafana/data';
+import { DataFrame, DataQueryResponse, DataSourceInstanceSettings, dateTimeFormat, FieldType } from '@grafana/data';
 
 export function createTableFrameFromDeepQlQuery(
   data: SnapshotSearchMetadata[],
   instanceSettings: DataSourceInstanceSettings
 ): DataFrame[] {
-  const frame = new MutableDataFrame({
+  const frame: DataFrame = {
     fields: [
       {
         name: 'snapshotID',
         type: FieldType.string,
+        values: [],
         config: {
           unit: 'string',
           displayNameFromDS: 'Snapshot ID',
@@ -56,14 +50,15 @@ export function createTableFrameFromDeepQlQuery(
           ],
         },
       },
-      { name: 'location', type: FieldType.string, config: { displayNameFromDS: 'Snapshot Location' } },
-      { name: 'startTime', type: FieldType.string, config: { displayNameFromDS: 'Start time' } },
-      { name: 'duration', type: FieldType.number, config: { displayNameFromDS: 'Duration', unit: 'ns' } },
+      { name: 'location', values: [], type: FieldType.string, config: { displayNameFromDS: 'Snapshot Location' } },
+      { name: 'startTime', values: [], type: FieldType.string, config: { displayNameFromDS: 'Start time' } },
+      { name: 'duration', values: [], type: FieldType.number, config: { displayNameFromDS: 'Duration', unit: 'ns' } },
     ],
     meta: {
       preferredVisualisationType: 'table',
     },
-  });
+    length: 4,
+  };
 
   if (!data?.length) {
     return [frame];
@@ -81,21 +76,32 @@ export function createTableFrameFromDeepQlQuery(
     }, []);
 
   for (const row of tableRows) {
-    frame.add(row);
+    addRow(frame, row.snapshotID, row.location, row.startTime, row.durationNano);
   }
 
   return [frame, ...subDataFrames];
+}
+
+function addRow(frame: DataFrame, ...values: any[]) {
+  if (values.length !== frame.fields.length) {
+    throw new Error('row and field length mismatch');
+  }
+  for (let i = 0; i < values.length; i++) {
+    const value = values[i];
+    frame.fields[i].values.push(value);
+  }
 }
 
 export function createTableFrameFromSearch(
   data: SnapshotSearchMetadata[],
   instanceSettings: DataSourceInstanceSettings<DeepDatasourceOptions>
 ) {
-  const frame = new MutableDataFrame({
+  const frame: DataFrame = {
     fields: [
       {
         name: 'snapshotID',
         type: FieldType.string,
+        values: [],
         config: {
           unit: 'string',
           displayNameFromDS: 'Snapshot ID',
@@ -115,14 +121,15 @@ export function createTableFrameFromSearch(
           ],
         },
       },
-      { name: 'location', type: FieldType.string, config: { displayNameFromDS: 'Snapshot Location' } },
-      { name: 'startTime', type: FieldType.string, config: { displayNameFromDS: 'Start time' } },
-      { name: 'duration', type: FieldType.number, config: { displayNameFromDS: 'Duration', unit: 'ns' } },
+      { name: 'location', values: [], type: FieldType.string, config: { displayNameFromDS: 'Snapshot Location' } },
+      { name: 'startTime', values: [], type: FieldType.string, config: { displayNameFromDS: 'Start time' } },
+      { name: 'duration', values: [], type: FieldType.number, config: { displayNameFromDS: 'Duration', unit: 'ns' } },
     ],
     meta: {
       preferredVisualisationType: 'table',
     },
-  });
+    length: 4,
+  };
   if (!data?.length) {
     return frame;
   }
@@ -131,8 +138,8 @@ export function createTableFrameFromSearch(
     .sort((a, b) => parseInt(b?.startTimeUnixNano!, 10) / 1000000 - parseInt(a?.startTimeUnixNano!, 10) / 1000000)
     .map(transformToTraceData);
 
-  for (const trace of traceData) {
-    frame.add(trace);
+  for (const row of traceData) {
+    addRow(frame, row.snapshotID, row.location, row.startTime, row.durationNano);
   }
 
   return frame;

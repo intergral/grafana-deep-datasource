@@ -4,7 +4,9 @@
 
 - **[FEATURE]**: Add support for metrics and traces [#34](https://github.com/intergral/deep/pull/34) [@Umaaz](https://github.com/Umaaz)
 - **[ENHANCEMENT]**: Improve the fire count input to make it easier to understand [#34](https://github.com/intergral/deep/pull/34) [@Umaaz](https://github.com/Umaaz)
+- **[ENHANCEMENT]**: Add validation to inputs to help with error cases [#42](https://github.com/intergral/deep/pull/42) [@Umaaz](https://github.com/Umaaz)
 - **[BUGFIX]**: Correct links for documentation on query builder [#33](https://github.com/intergral/deep/pull/33) [@Umaaz](https://github.com/Umaaz)
+- **[CHANGE]**: Update to grafana 10.3.3 [#43](https://github.com/intergral/deep/pull/43) [@Umaaz](https://github.com/Umaaz)
 
 <!-- main END -->
 
