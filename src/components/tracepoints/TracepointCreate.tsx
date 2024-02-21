@@ -15,25 +15,25 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Props } from '../QueryEditor';
+import {Props} from '../QueryEditor';
 import {
-  Button,
-  HorizontalGroup,
-  InlineField,
-  InlineFieldRow,
-  InlineLabel,
-  Input,
-  Select,
-  useStyles2,
+    Button,
+    HorizontalGroup,
+    InlineField,
+    InlineFieldRow,
+    InlineLabel,
+    Input,
+    Select,
+    useStyles2,
 } from '@grafana/ui';
-import React, { useEffect, useState } from 'react';
-import { firstValueFrom } from 'rxjs';
-import { TagsField } from '../TagsField/TagsField';
-import { DEFAULT_FIRE_COUNT } from '../../types';
-import { css } from '@emotion/css';
-import { AccessoryButton } from '@grafana/experimental';
-import { v4 as uuidv4 } from 'uuid';
-import { GrafanaTheme2 } from '@grafana/data';
+import React, {useEffect, useState} from 'react';
+import {firstValueFrom} from 'rxjs';
+import {TagsField} from '../TagsField/TagsField';
+import {DEFAULT_FIRE_COUNT} from '../../types';
+import {css} from '@emotion/css';
+import {AccessoryButton} from '@grafana/experimental';
+import {v4 as uuidv4} from 'uuid';
+import {GrafanaTheme2} from '@grafana/data';
 
 const getStyles = (theme: GrafanaTheme2) => ({
   label: css`
@@ -68,11 +68,20 @@ const getStyles = (theme: GrafanaTheme2) => ({
   }),
 });
 
+interface ValidationErrors {
+  metrics: boolean[];
+  path: boolean
+  line: boolean
+  fireCount: boolean
+}
+
 export const TracepointCreate = ({ datasource, query, onChange, onRunQuery, onBlur }: Props) => {
   const styles = useStyles2(getStyles);
-  const [inputErrors, setInputErrors] = useState<{ [key: string]: boolean }>({
+  const [inputErrors, setInputErrors] = useState<ValidationErrors>({
     path: !isValidPath(query.tpCreate?.path),
     line: !isValidLine(`${query.tpCreate?.line_number}`),
+    fireCount: !isValidFireCount(`${query.tpCreate?.fire_count ?? 1}`),
+    metrics: (query.tpCreate?.metrics ?? []).map(v => !isValidMetrticName(v.name!)),
   });
   const [customOptions, setCustomOptions] = useState<Array<{ label: string; value: number }>>([]);
 
@@ -155,6 +164,31 @@ export const TracepointCreate = ({ datasource, query, onChange, onRunQuery, onBl
     return { label: `${number}`, value: number };
   }
 
+
+
+  const isValid = (val: string, validation: (val: string)=> boolean, key: string, index?: number): boolean => {
+    if(validation(val)) {
+      if (index !== undefined){
+          const inputError: boolean[] = (inputErrors as any)[key] ?? [];
+          inputError[index] = false
+        setInputErrors({...inputErrors, [key]: inputError})
+      } else {
+      setInputErrors({...inputErrors, [key]: false})
+      }
+        console.log(inputErrors)
+      return true
+    }
+      if (index !== undefined){
+          const inputError: boolean[] = (inputErrors as any)[key] ?? [];
+          inputError[index] = true
+          setInputErrors({...inputErrors, [key]: inputError})
+      } else {
+          setInputErrors({...inputErrors, [key]: true})
+      }
+      console.log(inputErrors)
+    return false
+  }
+
   return (
     <div>
       <InlineLabel className={styles.label}>
@@ -180,12 +214,8 @@ export const TracepointCreate = ({ datasource, query, onChange, onRunQuery, onBl
             value={query.tpCreate?.path ?? ''}
             placeholder={`/src/python/simple_test.py`}
             onChange={(v) => {
-              let value = v.currentTarget.value;
-              if (value && isValidPath(value)) {
-                setInputErrors({ ...inputErrors, path: false });
-              } else {
-                setInputErrors({ ...inputErrors, path: true });
-              }
+              const value = v.currentTarget.value;
+              isValid(value, isValidPath, "path")
 
               onChange({
                 ...query,
@@ -213,11 +243,7 @@ export const TracepointCreate = ({ datasource, query, onChange, onRunQuery, onBl
             placeholder={`31`}
             onChange={(v) => {
               let value = v.currentTarget.value;
-              if (value && isValidLine(value)) {
-                setInputErrors({ ...inputErrors, line: false });
-              } else {
-                setInputErrors({ ...inputErrors, line: true });
-              }
+              isValid(value, isValidLine, "line")
 
               onChange({
                 ...query,
@@ -231,7 +257,7 @@ export const TracepointCreate = ({ datasource, query, onChange, onRunQuery, onBl
         </InlineField>
         <InlineField
           label="Fire Count"
-          invalid={inputErrors.firecount}
+          invalid={inputErrors.fireCount}
           labelWidth={20}
           grow
           tooltip="Select or enter number of times to fire."
@@ -242,8 +268,7 @@ export const TracepointCreate = ({ datasource, query, onChange, onRunQuery, onBl
             options={[...fireCountValues, ...customOptions]}
             allowCustomValue={true}
             onCreateOption={(v) => {
-              if (isValidFireCount(v)) {
-                setInputErrors({ ...inputErrors, firecount: false });
+              if (isValid(v, isValidFireCount, "fireCount")) {
                 const valueInt = parseInt(v, 10);
                 setCustomOptions([...customOptions, { label: v, value: valueInt }]);
                 onChange({
@@ -253,16 +278,16 @@ export const TracepointCreate = ({ datasource, query, onChange, onRunQuery, onBl
                     fire_count: valueInt,
                   },
                 });
-              } else {
-                setInputErrors({ ...inputErrors, firecount: true });
               }
             }}
             onChange={(v) => {
+              const fireCount = v.value ?? DEFAULT_FIRE_COUNT;
+              isValid(`${fireCount}`, isValidFireCount, "fireCount")
               onChange({
                 ...query,
                 tpCreate: {
                   ...query.tpCreate,
-                  fire_count: v.value ?? DEFAULT_FIRE_COUNT,
+                  fire_count: fireCount,
                 },
               });
             }}
@@ -272,7 +297,7 @@ export const TracepointCreate = ({ datasource, query, onChange, onRunQuery, onBl
       <InlineFieldRow>
         <InlineField label="Targetting" labelWidth={20} grow tooltip="Values should be in logfmt.">
           <TagsField
-            placeholder="path=/some/file.py error=true"
+            placeholder="service.name=myApp app.version=1.2.3"
             value={query.tpCreate?.targeting ?? ''}
             onChange={setTargeting}
             onBlur={onBlur}
@@ -317,7 +342,7 @@ export const TracepointCreate = ({ datasource, query, onChange, onRunQuery, onBl
         </InlineField>
       </InlineFieldRow>
       <InlineFieldRow className={styles.embedRow}>
-        <InlineField label="Metrics" labelWidth={20} tooltip="Create metrics at tracepoint location.">
+        <InlineField label="Metrics" labelWidth={20} grow tooltip="Create metrics at tracepoint location.">
           <div>
             {(
               query.tpCreate?.metrics ?? [
@@ -329,18 +354,21 @@ export const TracepointCreate = ({ datasource, query, onChange, onRunQuery, onBl
               <div key={i}>
                 <HorizontalGroup spacing={'xs'} width={'auto'}>
                   <Input
+                    invalid={inputErrors.metrics[i]}
                     id={'metric'}
                     placeholder={'uuid_length'}
                     value={metric.name}
                     type={'text'}
                     onChange={(v) => {
+                      const val = v.currentTarget.value;
+                      isValid(val, isValidMetrticName, `metrics`, i)
                       onChange({
                         ...query,
                         tpCreate: {
                           ...query.tpCreate,
                           metrics: (query.tpCreate?.metrics ?? [metric]).map((metric) => {
                             if (metric.id === metric.id) {
-                              metric.name = v.currentTarget.value;
+                              metric.name = val;
                             }
                             return metric;
                           }),
@@ -361,7 +389,7 @@ export const TracepointCreate = ({ datasource, query, onChange, onRunQuery, onBl
                             ...query.tpCreate,
                             metrics: (query.tpCreate?.metrics ?? [metric]).map((metric) => {
                               if (metric.id === metric.id) {
-                                metric.expression = v.currentTarget.value;
+                                metric.expression = v.currentTarget.value ?? 1;
                               }
                               return metric;
                             }),
@@ -429,7 +457,7 @@ export const TracepointCreate = ({ datasource, query, onChange, onRunQuery, onBl
                     }}
                   />
 
-                  {(watch || (query.tpCreate?.watches ?? [watch]).length > 1) && (
+                  {(watch.expression || (query.tpCreate?.watches ?? [watch]).length > 1) && (
                     <AccessoryButton
                       aria-label="Remove watch"
                       variant="secondary"
@@ -446,7 +474,7 @@ export const TracepointCreate = ({ datasource, query, onChange, onRunQuery, onBl
                       tooltip="Remove watch"
                     />
                   )}
-                  {watch && i === (query.tpCreate?.watches ?? [watch]).length - 1 && (
+                  {watch.expression && i === (query.tpCreate?.watches ?? [watch]).length - 1 && (
                     <span className={styles.addValue}>
                       <AccessoryButton
                         aria-label="Add watch"
@@ -504,3 +532,7 @@ const isValidFireCount = (val: string): boolean => {
   const number = parseInt(val, 10);
   return number >= -1 && number !== 0;
 };
+
+const isValidMetrticName = (val: string): boolean => {
+    return /^[a-zA-Z_:][a-zA-Z0-9_:]*$/.test(val)
+}
