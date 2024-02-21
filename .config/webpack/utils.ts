@@ -1,27 +1,25 @@
-/*
- * Copyright (C) 2023  Intergral GmbH
- *
- *     This program is free software: you can redistribute it and/or modify
- *     it under the terms of the GNU Affero General Public License as published by
- *     the Free Software Foundation, either version 3 of the License, or
- *     (at your option) any later version.
- *
- *     This program is distributed in the hope that it will be useful,
- *     but WITHOUT ANY WARRANTY; without even the implied warranty of
- *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *     GNU Affero General Public License for more details.
- *
- *     You should have received a copy of the GNU Affero General Public License
- *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
-
 import fs from 'fs';
+import process from 'process';
+import os from 'os';
 import path from 'path';
-import util from 'util';
-import glob from 'glob';
+import { glob } from 'glob';
 import { SOURCE_DIR } from './constants';
 
-const globAsync = util.promisify(glob);
+export function isWSL() {
+  if (process.platform !== 'linux') {
+    return false;
+  }
+
+  if (os.release().toLowerCase().includes('microsoft')) {
+    return true;
+  }
+
+  try {
+    return fs.readFileSync('/proc/version', 'utf8').toLowerCase().includes('microsoft');
+  } catch {
+    return false;
+  }
+}
 
 export function getPackageJson() {
   return require(path.resolve(process.cwd(), 'package.json'));
@@ -38,12 +36,12 @@ export function hasReadme() {
 // Support bundling nested plugins by finding all plugin.json files in src directory
 // then checking for a sibling module.[jt]sx? file.
 export async function getEntries(): Promise<Record<string, string>> {
-  const pluginsJson = await globAsync('**/src/**/plugin.json', { absolute: true });
+  const pluginsJson = await glob('**/src/**/plugin.json', { absolute: true });
 
   const plugins = await Promise.all(
     pluginsJson.map((pluginJson) => {
       const folder = path.dirname(pluginJson);
-      return globAsync(`${folder}/module.{ts,tsx,js,jsx}`, { absolute: true });
+      return glob(`${folder}/module.{ts,tsx,js,jsx}`, { absolute: true });
     })
   );
 

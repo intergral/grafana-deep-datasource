@@ -35,7 +35,7 @@ func TestQueryByIdNotFound(t *testing.T) {
 	settings := &backend.DataSourceInstanceSettings{
 		URL: ts.URL,
 	}
-	ds, err := NewDeepDatasource(*settings)
+	ds, err := NewDeepDatasource(context.Background(), *settings)
 
 	resp, err := ds.(*DeepDatasource).QueryData(context.Background(),
 		&backend.QueryDataRequest{
