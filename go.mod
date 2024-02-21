@@ -1,6 +1,6 @@
 module github.com/intergral/grafana-deep-datasource
 
-go 1.20
+go 1.22
 
 require (
 	github.com/go-kit/log v0.2.1
