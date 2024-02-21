@@ -49,8 +49,8 @@ var (
 )
 
 // NewDeepDatasource creates a new datasource instance.
-func NewDeepDatasource(settings backend.DataSourceInstanceSettings) (instancemgmt.Instance, error) {
-	client, err := buildHttpClient(settings)
+func NewDeepDatasource(ctx context.Context, settings backend.DataSourceInstanceSettings) (instancemgmt.Instance, error) {
+	client, err := buildHttpClient(ctx, settings)
 	if err != nil {
 		return nil, err
 	}
@@ -61,16 +61,16 @@ func NewDeepDatasource(settings backend.DataSourceInstanceSettings) (instancemgm
 	}, nil
 }
 
-func buildHttpClient(settings backend.DataSourceInstanceSettings) (*http.Client, error) {
-	mw, err := getMiddlewares(settings)
+func buildHttpClient(ctx context.Context, settings backend.DataSourceInstanceSettings) (*http.Client, error) {
+	mw, err := getMiddlewares(ctx, settings)
 	if err != nil {
 		return nil, err
 	}
 	return httpclient.New(mw)
 }
 
-func getMiddlewares(settings backend.DataSourceInstanceSettings) (httpclient.Options, error) {
-	return settings.HTTPClientOptions()
+func getMiddlewares(ctx context.Context, settings backend.DataSourceInstanceSettings) (httpclient.Options, error) {
+	return settings.HTTPClientOptions(ctx)
 }
 
 // DeepDatasource is an example datasource which can respond to data queries, reports
