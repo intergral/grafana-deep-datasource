@@ -90,7 +90,7 @@ function addRow(frame: DataFrame, ...values: any[]) {
     const value = values[i];
     frame.fields[i].values.push(value);
   }
-  frame.length += 1
+  frame.length += 1;
 }
 
 export function createTableFrameFromSearch(
