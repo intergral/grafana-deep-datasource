@@ -57,7 +57,7 @@ export function createTableFrameFromDeepQlQuery(
     meta: {
       preferredVisualisationType: 'table',
     },
-    length: 4,
+    length: 0,
   };
 
   if (!data?.length) {
@@ -90,6 +90,7 @@ function addRow(frame: DataFrame, ...values: any[]) {
     const value = values[i];
     frame.fields[i].values.push(value);
   }
+  frame.length += 1
 }
 
 export function createTableFrameFromSearch(
@@ -128,7 +129,7 @@ export function createTableFrameFromSearch(
     meta: {
       preferredVisualisationType: 'table',
     },
-    length: 4,
+    length: 0,
   };
   if (!data?.length) {
     return frame;
