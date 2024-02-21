@@ -252,7 +252,7 @@ export class DeepDataSource extends DataSourceWithBackend<DeepQuery, DeepDatasou
 
     return super.query(req).pipe(
       map((response) => {
-        if (response.error) {
+        if (response.errors?.length) {
           return response;
         }
         return transformSnapshot(response);
@@ -268,7 +268,7 @@ export class DeepDataSource extends DataSourceWithBackend<DeepQuery, DeepDatasou
 
     return super.query(req).pipe(
       map((response) => {
-        if (response.error) {
+        if (response.errors?.length) {
           return response;
         }
         return transformTracepoint(response, this.instanceSettings);

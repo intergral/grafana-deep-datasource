@@ -15,25 +15,25 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {Props} from '../QueryEditor';
+import { Props } from '../QueryEditor';
 import {
-    Button,
-    HorizontalGroup,
-    InlineField,
-    InlineFieldRow,
-    InlineLabel,
-    Input,
-    Select,
-    useStyles2,
+  Button,
+  HorizontalGroup,
+  InlineField,
+  InlineFieldRow,
+  InlineLabel,
+  Input,
+  Select,
+  useStyles2,
 } from '@grafana/ui';
-import React, {useEffect, useState} from 'react';
-import {firstValueFrom} from 'rxjs';
-import {TagsField} from '../TagsField/TagsField';
-import {DEFAULT_FIRE_COUNT} from '../../types';
-import {css} from '@emotion/css';
-import {AccessoryButton} from '@grafana/experimental';
-import {v4 as uuidv4} from 'uuid';
-import {GrafanaTheme2} from '@grafana/data';
+import React, { useEffect, useState } from 'react';
+import { firstValueFrom } from 'rxjs';
+import { TagsField } from '../TagsField/TagsField';
+import { DEFAULT_FIRE_COUNT } from '../../types';
+import { css } from '@emotion/css';
+import { AccessoryButton } from '@grafana/experimental';
+import { v4 as uuidv4 } from 'uuid';
+import { GrafanaTheme2 } from '@grafana/data';
 
 const getStyles = (theme: GrafanaTheme2) => ({
   label: css`
@@ -70,9 +70,9 @@ const getStyles = (theme: GrafanaTheme2) => ({
 
 interface ValidationErrors {
   metrics: boolean[];
-  path: boolean
-  line: boolean
-  fireCount: boolean
+  path: boolean;
+  line: boolean;
+  fireCount: boolean;
 }
 
 export const TracepointCreate = ({ datasource, query, onChange, onRunQuery, onBlur }: Props) => {
@@ -81,7 +81,7 @@ export const TracepointCreate = ({ datasource, query, onChange, onRunQuery, onBl
     path: !isValidPath(query.tpCreate?.path),
     line: !isValidLine(`${query.tpCreate?.line_number}`),
     fireCount: !isValidFireCount(`${query.tpCreate?.fire_count ?? 1}`),
-    metrics: (query.tpCreate?.metrics ?? []).map(v => !isValidMetrticName(v.name!)),
+    metrics: (query.tpCreate?.metrics ?? []).map((v) => !isValidMetrticName(v.name!)),
   });
   const [customOptions, setCustomOptions] = useState<Array<{ label: string; value: number }>>([]);
 
@@ -98,7 +98,8 @@ export const TracepointCreate = ({ datasource, query, onChange, onRunQuery, onBl
   }, [targeting]); // eslint-disable-line react-hooks/exhaustive-deps
 
   function anyError() {
-    return Object.values(inputErrors).some((v) => v);
+    const {metrics, ...rest} = inputErrors
+    return Object.values(rest).some((v) => v) || metrics.some((v) => v);
   }
 
   let spanOptions = [
@@ -164,30 +165,26 @@ export const TracepointCreate = ({ datasource, query, onChange, onRunQuery, onBl
     return { label: `${number}`, value: number };
   }
 
-
-
-  const isValid = (val: string, validation: (val: string)=> boolean, key: string, index?: number): boolean => {
-    if(validation(val)) {
-      if (index !== undefined){
-          const inputError: boolean[] = (inputErrors as any)[key] ?? [];
-          inputError[index] = false
-        setInputErrors({...inputErrors, [key]: inputError})
+  const isValid = (val: string, validation: (val: string) => boolean, key: string, index?: number): boolean => {
+    if (validation(val)) {
+      if (index !== undefined) {
+        const inputError: boolean[] = (inputErrors as any)[key] ?? [];
+        inputError[index] = false;
+        setInputErrors({ ...inputErrors, [key]: inputError });
       } else {
-      setInputErrors({...inputErrors, [key]: false})
+        setInputErrors({ ...inputErrors, [key]: false });
       }
-        console.log(inputErrors)
-      return true
+      return true;
     }
-      if (index !== undefined){
-          const inputError: boolean[] = (inputErrors as any)[key] ?? [];
-          inputError[index] = true
-          setInputErrors({...inputErrors, [key]: inputError})
-      } else {
-          setInputErrors({...inputErrors, [key]: true})
-      }
-      console.log(inputErrors)
-    return false
-  }
+    if (index !== undefined) {
+      const inputError: boolean[] = (inputErrors as any)[key] ?? [];
+      inputError[index] = true;
+      setInputErrors({ ...inputErrors, [key]: inputError });
+    } else {
+      setInputErrors({ ...inputErrors, [key]: true });
+    }
+    return false;
+  };
 
   return (
     <div>
@@ -215,7 +212,7 @@ export const TracepointCreate = ({ datasource, query, onChange, onRunQuery, onBl
             placeholder={`/src/python/simple_test.py`}
             onChange={(v) => {
               const value = v.currentTarget.value;
-              isValid(value, isValidPath, "path")
+              isValid(value, isValidPath, 'path');
 
               onChange({
                 ...query,
@@ -243,7 +240,7 @@ export const TracepointCreate = ({ datasource, query, onChange, onRunQuery, onBl
             placeholder={`31`}
             onChange={(v) => {
               let value = v.currentTarget.value;
-              isValid(value, isValidLine, "line")
+              isValid(value, isValidLine, 'line');
 
               onChange({
                 ...query,
@@ -268,7 +265,7 @@ export const TracepointCreate = ({ datasource, query, onChange, onRunQuery, onBl
             options={[...fireCountValues, ...customOptions]}
             allowCustomValue={true}
             onCreateOption={(v) => {
-              if (isValid(v, isValidFireCount, "fireCount")) {
+              if (isValid(v, isValidFireCount, 'fireCount')) {
                 const valueInt = parseInt(v, 10);
                 setCustomOptions([...customOptions, { label: v, value: valueInt }]);
                 onChange({
@@ -282,7 +279,7 @@ export const TracepointCreate = ({ datasource, query, onChange, onRunQuery, onBl
             }}
             onChange={(v) => {
               const fireCount = v.value ?? DEFAULT_FIRE_COUNT;
-              isValid(`${fireCount}`, isValidFireCount, "fireCount")
+              isValid(`${fireCount}`, isValidFireCount, 'fireCount');
               onChange({
                 ...query,
                 tpCreate: {
@@ -361,7 +358,7 @@ export const TracepointCreate = ({ datasource, query, onChange, onRunQuery, onBl
                     type={'text'}
                     onChange={(v) => {
                       const val = v.currentTarget.value;
-                      isValid(val, isValidMetrticName, `metrics`, i)
+                      isValid(val, isValidMetrticName, `metrics`, i);
                       onChange({
                         ...query,
                         tpCreate: {
@@ -534,5 +531,5 @@ const isValidFireCount = (val: string): boolean => {
 };
 
 const isValidMetrticName = (val: string): boolean => {
-    return /^[a-zA-Z_:][a-zA-Z0-9_:]*$/.test(val)
-}
+  return /^[a-zA-Z_:][a-zA-Z0-9_:]*$/.test(val);
+};
