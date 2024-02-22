@@ -1,7 +1,29 @@
 ARG grafana_version=latest
 ARG grafana_image=grafana-enterprise
 
-FROM grafana/${grafana_image}:${grafana_version}
+FROM grafana/${grafana_image}:${grafana_version}-ubuntu
+
+USER root
+WORKDIR /root
+
+RUN apt -y update
+RUN apt -y install git build-essential
+
+RUN curl -L https://go.dev/dl/go1.22.0.linux-amd64.tar.gz > go1.22.linux-amd64.tar.gz
+
+RUN rm -rf /usr/local/go && \
+tar -C /usr/local -xzf go1.22.linux-amd64.tar.gz
+
+RUN touch README; printf "~~~~~~ START THE DLV SERVER WITH THIS COMMAND BEFORE RUNNING IDE DEBUGGER ~~~~~~ \r\nmage debugger\r\n\r\n" >> README
+
+RUN echo "export PATH=$PATH:/usr/local/go/bin:~/go/bin" >> ~/.bashrc
+RUN echo "cat ~/README" >> ~/.bashrc
+
+RUN /usr/local/go/bin/go install github.com/go-delve/delve/cmd/dlv@latest
+RUN git clone https://github.com/magefile/mage; \
+cd mage; \
+export PATH=$PATH:/usr/local/go/bin; \
+go run bootstrap.go \
 
 # Make it as simple as possible to access the grafana instance for development purposes
 # Do NOT enable these settings in a public facing / production grafana instance

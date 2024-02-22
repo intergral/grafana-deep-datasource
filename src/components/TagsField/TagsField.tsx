@@ -184,7 +184,7 @@ const getStyles = (theme: GrafanaTheme2, placeholder: string): EditorStyles => {
   return {
     queryField: css`
       height: 32px;
-      border-radius: ${theme.shape.radius.pill};
+      border-radius: ${theme.shape.radius.default};
       border: 1px solid ${theme.components.input.borderColor};
       flex: 1;
     `,
