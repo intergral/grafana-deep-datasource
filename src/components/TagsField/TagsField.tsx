@@ -23,7 +23,7 @@ import { CodeEditor, Monaco, monacoTypes, useTheme2 } from '@grafana/ui';
 
 import { CompletionProvider } from './autocomplete';
 import { languageDefinition } from './syntax';
-import { DeepDataSource } from '../../deepql/DeepDataSource';
+import { DeepDataSource } from '../../DeepDataSource';
 
 interface Props {
   placeholder: string;

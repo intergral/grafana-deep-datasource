@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023  Intergral GmbH
+ * Copyright (C) 2024  Intergral GmbH
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU Affero General Public License as published by
@@ -15,12 +15,17 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { DataSourcePlugin } from '@grafana/data';
-import { DeepDataSource } from './DeepDataSource';
-import { ConfigEditor } from './components/ConfigEditor';
-import { QueryEditor } from './components/QueryEditor';
-import { DeepQuery, DeepDatasourceOptions } from './types';
+package plugin
 
-export const plugin = new DataSourcePlugin<DeepDataSource, DeepQuery, DeepDatasourceOptions>(DeepDataSource)
-  .setConfigEditor(ConfigEditor)
-  .setQueryEditor(QueryEditor);
+type SearchResponse struct {
+	Snapshots []*SnapshotSearchMetadata
+}
+
+type SnapshotSearchMetadata struct {
+	SnapshotID        string `json:"snapshotID"`
+	ServiceName       string `json:"serviceName"`
+	FilePath          string `json:"filePath"`
+	LineNo            uint32 `json:"lineNo"`
+	StartTimeUnixNano string `json:"startTimeUnixNano"`
+	DurationNano      string `json:"durationNano"`
+}
