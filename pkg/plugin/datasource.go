@@ -32,6 +32,7 @@ import (
 	"github.com/intergral/go-deep-proto/common/v1"
 	deepPoll "github.com/intergral/go-deep-proto/poll/v1"
 	deepTp "github.com/intergral/go-deep-proto/tracepoint/v1"
+	"github.com/intergral/grafana-deep-datasource/pkg/plugin/deeppb"
 	"io"
 	"net/http"
 	"os"
@@ -231,7 +232,7 @@ func snapshotLocation(snapshot *SnapshotSearchMetadata) string {
 	return strings.TrimLeft(fmt.Sprintf("%s %s:%d", snapshot.ServiceName, snapshot.FilePath, snapshot.LineNo), " ")
 }
 
-func pollResponseToFrame(pollResponse *deepPoll.PollResponse, pluginContext backend.PluginContext) (*data.Frame, error) {
+func pollResponseToFrame(pollResponse []*deepTp.TracePointConfig, pluginContext backend.PluginContext) (*data.Frame, error) {
 	frame := &data.Frame{
 		Name: "Tracepoint",
 		Fields: []*data.Field{
@@ -287,7 +288,7 @@ func pollResponseToFrame(pollResponse *deepPoll.PollResponse, pluginContext back
 		},
 	}
 
-	for _, tp := range pollResponse.Response {
+	for _, tp := range pollResponse {
 		tpArgs, _ := json.Marshal(tp.Args)
 		tpWatches, _ := json.Marshal(tp.Watches)
 		tpTargeting, _ := json.Marshal(keyValuesToMap(tp.Targeting))
@@ -530,12 +531,15 @@ func (d *DeepDatasource) queryDeepQl(ctx context.Context, pluginContext backend.
 		}
 	}
 	if responseType == "tracepoint" {
-		var pollResponse deepPoll.PollResponse
-		err := jsonpb.Unmarshal(response.Body, &pollResponse)
+		var pollResponse deeppb.DeepQlResponse
+		err = jsonpb.Unmarshal(response.Body, &pollResponse)
 		if err != nil {
 			return backend.ErrDataResponse(backend.StatusBadRequest, fmt.Sprintf("response failed: %v", err.Error()))
 		}
-		return d.processTracepointResponse(query, &pollResponse, pluginContext)
+		if pollResponse.Type == "list" {
+			return d.processTracepointResponse(query, pollResponse.Affected, pluginContext)
+		}
+		return d.processTracepointResponse(query, pollResponse.All, pluginContext)
 	}
 
 	return backend.DataResponse{
@@ -563,10 +567,10 @@ func (d *DeepDatasource) processProtoTracepointResponse(query backend.DataQuery,
 		return backend.ErrDataResponse(backend.StatusBadRequest, fmt.Sprintf("response failed: %v", err.Error()))
 	}
 
-	return d.processTracepointResponse(query, &pollResponse, pluginContext)
+	return d.processTracepointResponse(query, pollResponse.Response, pluginContext)
 }
 
-func (d *DeepDatasource) processTracepointResponse(query backend.DataQuery, pollResponse *deepPoll.PollResponse, pluginContext backend.PluginContext) backend.DataResponse {
+func (d *DeepDatasource) processTracepointResponse(query backend.DataQuery, pollResponse []*deepTp.TracePointConfig, pluginContext backend.PluginContext) backend.DataResponse {
 	frame, err := pollResponseToFrame(pollResponse, pluginContext)
 	if err != nil {
 		return backend.ErrDataResponse(backend.StatusBadRequest, fmt.Sprintf("convertion failed: %v", err.Error()))
