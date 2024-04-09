@@ -71,7 +71,7 @@
     "@grafana/experimental": "^1.7.10",
     "@grafana/runtime": "10.3.3",
     "@grafana/schema": "10.3.3",
-    "@grafana/ui": "10.3.3",
+    "@grafana/ui": "10.4.0",
     "prismjs": "^1.29.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
