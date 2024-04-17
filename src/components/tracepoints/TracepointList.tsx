@@ -17,7 +17,7 @@
 
 import { Props } from '../QueryEditor';
 import { InlineField, InlineFieldRow, InlineLabel, Input } from '@grafana/ui';
-import { DEFAULT_LIMIT } from '../../deepql/DeepDataSource';
+import { DEFAULT_LIMIT } from '../../DeepDataSource';
 import React, { useState } from 'react';
 
 export const TracepointList = ({ query, onChange, onRunQuery }: Props) => {

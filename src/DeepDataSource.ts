@@ -1,18 +1,18 @@
 /*
- *    Copyright 2014-2021 Grafana Labs
+ * Copyright (C) 2024  Intergral GmbH
  *
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU Affero General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
  *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU Affero General Public License for more details.
  *
- *        http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
+ *     You should have received a copy of the GNU Affero General Public License
+ *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 import { CoreApp, DataQueryRequest, DataQueryResponse, DataSourceInstanceSettings, ScopedVars } from '@grafana/data';
@@ -26,17 +26,12 @@ import {
   TemplateSrv,
 } from '@grafana/runtime';
 
-import { DeepDatasourceOptions, DeepQuery, DEFAULT_FIRE_COUNT, DEFAULT_QUERY, SearchQueryParams } from '../types';
-import DeepLanguageProvider from './DeepLanguageProvider';
+import { DeepDatasourceOptions, DeepQuery, DEFAULT_FIRE_COUNT, DEFAULT_QUERY, SearchQueryParams } from './types';
+import DeepLanguageProvider from './deepql/DeepLanguageProvider';
 import { catchError, lastValueFrom, map, merge, Observable, of } from 'rxjs';
 import { serializeParams } from 'Utils';
 import { groupBy, identity, pick, pickBy } from 'lodash';
-import {
-  createTableFrameFromDeepQlQuery,
-  createTableFrameFromSearch,
-  transformSnapshot,
-  transformTracepoint,
-} from 'ResultTransformer';
+import { transformSearchResult, transformSnapshot, transformTracepoint } from 'ResultTransformer';
 
 export const DEFAULT_LIMIT = 20;
 
@@ -81,9 +76,7 @@ export class DeepDataSource extends DataSourceWithBackend<DeepQuery, DeepDatasou
         queries.push(
           this._request('/api/search', searchQuery).pipe(
             map((response) => {
-              return {
-                data: [createTableFrameFromSearch(response.data.snapshots, this.instanceSettings)],
-              };
+              return transformSearchResult(response.data.snapshots, this.instanceSettings);
             }),
             catchError((error) => {
               return of({ error: { message: error.data.message }, data: [] });
@@ -154,7 +147,7 @@ export class DeepDataSource extends DataSourceWithBackend<DeepQuery, DeepDatasou
             hasQuery: queryValue !== '',
           });
 
-          queries.push(this.handleSingleRequest(options, appliedQuery));
+          queries.push(this.handleSingleRequest(options, { ...appliedQuery, queryType: 'byid' }));
         } else {
           reportInteraction('grafana_traces_deepql_queried', {
             datasourceType: 'deep',
@@ -163,21 +156,11 @@ export class DeepDataSource extends DataSourceWithBackend<DeepQuery, DeepDatasou
             query: queryValue ?? '',
           });
           queries.push(
-            this._request('/api/search', {
-              q: queryValue,
-              limit: options.targets[0].limit ?? DEFAULT_LIMIT,
-              start: options.range.from.unix(),
-              end: options.range.to.unix(),
-            }).pipe(
-              map((response) => {
-                return {
-                  data: createTableFrameFromDeepQlQuery(response.data.traces, this.instanceSettings),
-                };
-              }),
-              catchError((error) => {
-                return of({ error: { message: error.data.message }, data: [] });
-              })
-            )
+            this.handleDeepQlRequest(options, {
+              ...appliedQuery,
+              query: queryValue,
+              limit: appliedQuery.limit || DEFAULT_LIMIT,
+            })
           );
         }
       } catch (error) {
@@ -194,24 +177,24 @@ export class DeepDataSource extends DataSourceWithBackend<DeepQuery, DeepDatasou
   buildSearchQuery(query: DeepQuery, timeRange?: { startTime: number; endTime?: number }): SearchQueryParams {
     let tags = query.search ?? '';
 
-    let tempoQuery = pick(query, ['limit']);
+    let deepQuery = pick(query, ['limit']);
     // Remove empty properties
-    tempoQuery = pickBy(tempoQuery, identity);
+    deepQuery = pickBy(deepQuery, identity);
 
     if (query.serviceName) {
       tags += `service.name="${query.serviceName}"`;
     }
 
     // Set default limit
-    if (!tempoQuery.limit) {
-      tempoQuery.limit = DEFAULT_LIMIT;
+    if (!deepQuery.limit) {
+      deepQuery.limit = DEFAULT_LIMIT;
     }
 
-    if (!Number.isInteger(tempoQuery.limit) || tempoQuery.limit <= 0) {
+    if (!Number.isInteger(deepQuery.limit) || deepQuery.limit <= 0) {
       throw new Error('Please enter a valid limit.');
     }
 
-    let searchQuery: SearchQueryParams = { tags, ...tempoQuery };
+    let searchQuery: SearchQueryParams = { tags, ...deepQuery };
 
     if (timeRange) {
       searchQuery.start = timeRange.startTime;
@@ -323,5 +306,24 @@ export class DeepDataSource extends DataSourceWithBackend<DeepQuery, DeepDatasou
     }
 
     return kvs;
+  }
+
+  private handleDeepQlRequest(
+    options: DataQueryRequest<DeepQuery>,
+    appliedQuery: DeepQuery
+  ): Observable<DataQueryResponse> {
+    const req: DataQueryRequest<DeepQuery> = {
+      ...options,
+      targets: [appliedQuery],
+    };
+
+    return super.query(req).pipe(
+      map((response) => {
+        if (response.errors?.length) {
+          return response;
+        }
+        return response;
+      })
+    );
   }
 }

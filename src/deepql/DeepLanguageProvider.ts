@@ -18,7 +18,7 @@
 import { LanguageProvider, SelectableValue } from '@grafana/data';
 import { CompletionItemGroup, TypeaheadInput, TypeaheadOutput } from '@grafana/ui';
 
-import { DeepDataSource } from './DeepDataSource';
+import { DeepDataSource } from '../DeepDataSource';
 import { Value } from 'slate';
 
 export default class DeepLanguageProvider extends LanguageProvider {

@@ -15,6 +15,9 @@ services:
       - SYS_PTRACE
     security_opt:
       - seccomp:unconfined
+    environment:
+      # disable vcs during mage debugger build
+      GOFLAGS: -buildvcs=false
     volumes:
       - ./:/root/dev
       - ./dist:/var/lib/grafana/plugins/intergral-deep-datasource

@@ -27,7 +27,7 @@ import { languageDefinition } from '../deepql/deepql';
 import { Props } from './QueryEditor';
 import { defaults } from 'lodash';
 import { DEFAULT_QUERY } from '../types';
-import { DeepDataSource } from '../deepql/DeepDataSource';
+import { DeepDataSource } from '../DeepDataSource';
 
 interface QLProps extends Props {
   placeholder: string;
@@ -127,7 +127,7 @@ function setupRegisterInteractionCommand(editor: monacoTypes.editor.IStandaloneC
   return editor.addCommand(0, function (_, label, type: CompletionType) {
     const properties: Record<string, unknown> = { datasourceType: 'deep', type };
     // Filter out the label for TAG_VALUE completions to avoid potentially exposing sensitive data
-    if (type !== 'TAG_VALUE') {
+    if (type !== 'VALUE') {
       properties.label = label;
     }
     reportInteraction('grafana_traces_deepql_completion', properties);
@@ -169,11 +169,6 @@ function useAutocomplete(datasource: DeepDataSource) {
         const tags = datasource.languageProvider.getTags();
 
         if (tags) {
-          // This is needed because the /api/v2/search/tag/${tag}/values API expects "status" and the v1 API expects "status.code"
-          // so Deep doesn't send anything and we inject it here for the autocomplete
-          if (!tags.find((t) => t === 'status')) {
-            tags.push('status');
-          }
           providerRef.current.setTags(tags);
         }
       } catch (error) {
@@ -230,7 +225,7 @@ interface EditorStyles {
 const getStyles = (theme: GrafanaTheme2, placeholder: string): EditorStyles => {
   return {
     queryField: css`
-      border-radius: ${theme.shape.radius.pill};
+      border-radius: ${theme.shape.radius.default};
       border: 1px solid ${theme.components.input.borderColor};
       flex: 1;
     `,

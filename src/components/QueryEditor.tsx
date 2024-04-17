@@ -18,7 +18,7 @@
 import React from 'react';
 import { InlineField, RadioButtonGroup, InlineFieldRow } from '@grafana/ui';
 import { QueryEditorProps, SelectableValue } from '@grafana/data';
-import { DeepDataSource } from '../deepql/DeepDataSource';
+import { DeepDataSource } from '../DeepDataSource';
 import { DeepQLSearch } from './DeepQLSearch';
 import { DeepQueryType, DeepDatasourceOptions, DeepQuery } from '../types';
 import { config, reportInteraction } from '@grafana/runtime';
