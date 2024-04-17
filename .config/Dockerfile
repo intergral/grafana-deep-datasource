@@ -1,7 +1,8 @@
 ARG grafana_version=latest
 ARG grafana_image=grafana-enterprise
+ARG grafana_repo=grafana
 
-FROM grafana/${grafana_image}:${grafana_version}-ubuntu
+FROM ${grafana_repo}/${grafana_image}:${grafana_version}-ubuntu
 
 USER root
 WORKDIR /root
