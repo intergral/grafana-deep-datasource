@@ -8,8 +8,7 @@
 - **[ENHANCEMENT]**: Add validation to inputs to help with error cases [#42](https://github.com/intergral/deep/pull/42) [@Umaaz](https://github.com/Umaaz)
 - **[BUGFIX]**: Correct links for documentation on query builder [#33](https://github.com/intergral/deep/pull/33) [@Umaaz](https://github.com/Umaaz)
 - **[CHANGE]**: Update to grafana 10.3.3 [#43](https://github.com/intergral/deep/pull/43) [@Umaaz](https://github.com/Umaaz)
-- 
-<!-- 1.0.3 END -->
+- <!-- 1.0.3 END -->
 
 <!-- 1.0.2 Start -->
 
