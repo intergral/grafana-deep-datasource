@@ -1,3 +1,11 @@
+<!-- 1.0.4 Start -->
+
+# 1.0.4 (06/05/2024)
+
+- **[BUGFIX]**: Fix auth propagation when using cookie auth [#51](https://github.com/intergral/deep/pull/51) [@Umaaz](https://github.com/Umaaz)
+
+<!-- 1.0.4 END -->
+
 <!-- 1.0.3 Start -->
 
 # 1.0.3 (17/04/2024)
