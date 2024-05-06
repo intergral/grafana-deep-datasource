@@ -104,11 +104,11 @@ func (d *DeepDatasource) QueryData(ctx context.Context, req *backend.QueryDataRe
 		var res backend.DataResponse
 		switch q.QueryType {
 		case "deepql":
-			res = d.queryDeepQl(ctx, req.PluginContext, q)
+			res = d.queryDeepQl(ctx, req, q)
 		case "byid":
-			res = d.queryByID(ctx, req.PluginContext, q)
+			res = d.queryByID(ctx, req, q)
 		case "tracepoint":
-			res = d.queryTracepoint(ctx, req.PluginContext, q)
+			res = d.queryTracepoint(ctx, req, q)
 		}
 
 		// save the response in a hashmap
@@ -126,14 +126,15 @@ type queryModel struct {
 	Query       string `json:"query"`
 }
 
-func (d *DeepDatasource) queryTracepoint(_ context.Context, pCtx backend.PluginContext, query backend.DataQuery) backend.DataResponse {
+func (d *DeepDatasource) queryTracepoint(_ context.Context, req *backend.QueryDataRequest, query backend.DataQuery) backend.DataResponse {
 
-	url := fmt.Sprintf("%v/api/tracepoints", pCtx.DataSourceInstanceSettings.URL)
+	url := fmt.Sprintf("%v/api/tracepoints", req.PluginContext.DataSourceInstanceSettings.URL)
 
 	request, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
 		return backend.ErrDataResponse(backend.StatusBadRequest, fmt.Sprintf("cannot build request: %v", err.Error()))
 	}
+	attachHeaders(request, req.Headers)
 	request.Header.Set("Accept", "application/protobuf")
 
 	response, err := d.client.Do(request)
@@ -141,10 +142,10 @@ func (d *DeepDatasource) queryTracepoint(_ context.Context, pCtx backend.PluginC
 		return backend.ErrDataResponse(backend.StatusBadRequest, fmt.Sprintf("request failed: %v", err.Error()))
 	}
 
-	return d.processProtoTracepointResponse(query, response, pCtx)
+	return d.processProtoTracepointResponse(query, response, req.PluginContext)
 }
 
-func (d *DeepDatasource) queryByID(_ context.Context, pCtx backend.PluginContext, query backend.DataQuery) backend.DataResponse {
+func (d *DeepDatasource) queryByID(_ context.Context, req *backend.QueryDataRequest, query backend.DataQuery) backend.DataResponse {
 
 	// Unmarshal the JSON into our queryModel.
 	var qm queryModel
@@ -154,12 +155,13 @@ func (d *DeepDatasource) queryByID(_ context.Context, pCtx backend.PluginContext
 		return backend.ErrDataResponse(backend.StatusBadRequest, fmt.Sprintf("json unmarshal: %v", err.Error()))
 	}
 
-	url := fmt.Sprintf("%v/api/snapshots/%v", pCtx.DataSourceInstanceSettings.URL, qm.Query)
+	url := fmt.Sprintf("%v/api/snapshots/%v", req.PluginContext.DataSourceInstanceSettings.URL, qm.Query)
 
 	request, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
 		return backend.ErrDataResponse(backend.StatusBadRequest, fmt.Sprintf("cannot build request: %v", err.Error()))
 	}
+	attachHeaders(request, req.Headers)
 	request.Header.Set("Accept", "application/protobuf")
 
 	response, err := d.client.Do(request)
@@ -413,6 +415,7 @@ func (d *DeepDatasource) CheckHealth(_ context.Context, req *backend.CheckHealth
 		}, nil
 	}
 
+	attachHeaders(request, req.Headers)
 	response, err := d.client.Do(request)
 
 	if err != nil {
@@ -454,7 +457,7 @@ func (d *DeepDatasource) CheckHealth(_ context.Context, req *backend.CheckHealth
 	}, nil
 }
 
-func (d *DeepDatasource) queryDeepQl(ctx context.Context, pluginContext backend.PluginContext, query backend.DataQuery) backend.DataResponse {
+func (d *DeepDatasource) queryDeepQl(ctx context.Context, req *backend.QueryDataRequest, query backend.DataQuery) backend.DataResponse {
 
 	// Unmarshal the JSON into our queryModel.
 	var qm queryModel
@@ -464,12 +467,14 @@ func (d *DeepDatasource) queryDeepQl(ctx context.Context, pluginContext backend.
 		return backend.ErrDataResponse(backend.StatusBadRequest, fmt.Sprintf("json unmarshal: %v", err.Error()))
 	}
 
-	url := fmt.Sprintf("%v/api/search", pluginContext.DataSourceInstanceSettings.URL)
+	url := fmt.Sprintf("%v/api/search", req.PluginContext.DataSourceInstanceSettings.URL)
 
 	request, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
 		return backend.ErrDataResponse(backend.StatusBadRequest, fmt.Sprintf("cannot build request: %v", err.Error()))
 	}
+	attachHeaders(request, req.Headers)
+
 	values := request.URL.Query()
 	values.Set("q", qm.Query)
 	values.Set("limit", strconv.Itoa(int(qm.Limit)))
@@ -519,7 +524,7 @@ func (d *DeepDatasource) queryDeepQl(ctx context.Context, pluginContext backend.
 		}
 
 		if snapResp.Snapshots != nil {
-			frame, err := searchResultToFrame(snapResp.Snapshots, pluginContext)
+			frame, err := searchResultToFrame(snapResp.Snapshots, req.PluginContext)
 			if err != nil {
 				return backend.ErrDataResponse(backend.StatusBadRequest, fmt.Sprintf("convertion failed: %v", err.Error()))
 			}
@@ -537,13 +542,19 @@ func (d *DeepDatasource) queryDeepQl(ctx context.Context, pluginContext backend.
 			return backend.ErrDataResponse(backend.StatusBadRequest, fmt.Sprintf("response failed: %v", err.Error()))
 		}
 		if pollResponse.Type == "list" {
-			return d.processTracepointResponse(query, pollResponse.Affected, pluginContext)
+			return d.processTracepointResponse(query, pollResponse.Affected, req.PluginContext)
 		}
-		return d.processTracepointResponse(query, pollResponse.All, pluginContext)
+		return d.processTracepointResponse(query, pollResponse.All, req.PluginContext)
 	}
 
 	return backend.DataResponse{
 		Frames: []*data.Frame{},
+	}
+}
+
+func attachHeaders(request *http.Request, headers map[string]string) {
+	for k, v := range headers {
+		request.Header.Add(k, v)
 	}
 }
 
