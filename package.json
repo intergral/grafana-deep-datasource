@@ -1,6 +1,6 @@
 {
   "name": "grafana-deep-datasource",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Datasource plugin for DEEP",
   "scripts": {
     "build": "webpack -c ./.config/webpack/webpack.config.ts --env production",
