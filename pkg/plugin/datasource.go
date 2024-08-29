@@ -23,6 +23,7 @@ import (
 	"encoding/json"
 	"fmt"
 	kitlog "github.com/go-kit/log"
+	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/proto"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/httpclient"
@@ -31,10 +32,13 @@ import (
 	"github.com/intergral/go-deep-proto/common/v1"
 	deepPoll "github.com/intergral/go-deep-proto/poll/v1"
 	deepTp "github.com/intergral/go-deep-proto/tracepoint/v1"
+	"github.com/intergral/grafana-deep-datasource/pkg/plugin/deeppb"
 	"io"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
+	"time"
 )
 
 // Make sure DeepDatasource implements required interfaces. This is important to do
@@ -100,10 +104,11 @@ func (d *DeepDatasource) QueryData(ctx context.Context, req *backend.QueryDataRe
 		var res backend.DataResponse
 		switch q.QueryType {
 		case "deepql":
+			res = d.queryDeepQl(ctx, req, q)
 		case "byid":
-			res = d.queryByID(ctx, req.PluginContext, q)
+			res = d.queryByID(ctx, req, q)
 		case "tracepoint":
-			res = d.queryTracepoint(ctx, req.PluginContext, q)
+			res = d.queryTracepoint(ctx, req, q)
 		}
 
 		// save the response in a hashmap
@@ -121,50 +126,26 @@ type queryModel struct {
 	Query       string `json:"query"`
 }
 
-func (d *DeepDatasource) queryTracepoint(_ context.Context, pCtx backend.PluginContext, query backend.DataQuery) backend.DataResponse {
+func (d *DeepDatasource) queryTracepoint(_ context.Context, req *backend.QueryDataRequest, query backend.DataQuery) backend.DataResponse {
 
-	url := fmt.Sprintf("%v/api/tracepoints", pCtx.DataSourceInstanceSettings.URL)
+	url := fmt.Sprintf("%v/api/tracepoints", req.PluginContext.DataSourceInstanceSettings.URL)
 
 	request, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
 		return backend.ErrDataResponse(backend.StatusBadRequest, fmt.Sprintf("cannot build request: %v", err.Error()))
 	}
+	attachHeaders(request, req.Headers)
 	request.Header.Set("Accept", "application/protobuf")
 
 	response, err := d.client.Do(request)
 	if err != nil {
 		return backend.ErrDataResponse(backend.StatusBadRequest, fmt.Sprintf("request failed: %v", err.Error()))
 	}
-	defer func(Body io.ReadCloser) {
-		err := Body.Close()
-		if err != nil {
-			_ = d.log.Log("msg", "failed to close response body", "err", err)
-		}
-	}(response.Body)
 
-	all, err := io.ReadAll(response.Body)
-	if err != nil {
-		return backend.ErrDataResponse(backend.StatusBadRequest, fmt.Sprintf("read failed: %v", err.Error()))
-	}
-
-	var pollResponse deepPoll.PollResponse
-	err = proto.Unmarshal(all, &pollResponse)
-	if err != nil {
-		return backend.ErrDataResponse(backend.StatusBadRequest, fmt.Sprintf("response failed: %v", err.Error()))
-	}
-
-	frame, err := pollResponseToFrame(&pollResponse)
-	if err != nil {
-		return backend.ErrDataResponse(backend.StatusBadRequest, fmt.Sprintf("convertion failed: %v", err.Error()))
-	}
-
-	frame.RefID = query.RefID
-	return backend.DataResponse{
-		Frames: []*data.Frame{frame},
-	}
+	return d.processProtoTracepointResponse(query, response, req.PluginContext)
 }
 
-func (d *DeepDatasource) queryByID(_ context.Context, pCtx backend.PluginContext, query backend.DataQuery) backend.DataResponse {
+func (d *DeepDatasource) queryByID(_ context.Context, req *backend.QueryDataRequest, query backend.DataQuery) backend.DataResponse {
 
 	// Unmarshal the JSON into our queryModel.
 	var qm queryModel
@@ -174,12 +155,13 @@ func (d *DeepDatasource) queryByID(_ context.Context, pCtx backend.PluginContext
 		return backend.ErrDataResponse(backend.StatusBadRequest, fmt.Sprintf("json unmarshal: %v", err.Error()))
 	}
 
-	url := fmt.Sprintf("%v/api/snapshots/%v", pCtx.DataSourceInstanceSettings.URL, qm.Query)
+	url := fmt.Sprintf("%v/api/snapshots/%v", req.PluginContext.DataSourceInstanceSettings.URL, qm.Query)
 
 	request, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
 		return backend.ErrDataResponse(backend.StatusBadRequest, fmt.Sprintf("cannot build request: %v", err.Error()))
 	}
+	attachHeaders(request, req.Headers)
 	request.Header.Set("Accept", "application/protobuf")
 
 	response, err := d.client.Do(request)
@@ -187,49 +169,120 @@ func (d *DeepDatasource) queryByID(_ context.Context, pCtx backend.PluginContext
 		return backend.ErrDataResponse(backend.StatusBadRequest, fmt.Sprintf("request failed: %v", err.Error()))
 	}
 
-	if response.StatusCode == 404 {
-		return backend.ErrDataResponse(backend.StatusNotFound, fmt.Sprintf("Cannot find snapshot with id: %s", qm.Query))
-	}
-
-	defer func(Body io.ReadCloser) {
-		err := Body.Close()
-		if err != nil {
-			_ = d.log.Log("msg", "failed to close response body", "err", err)
-		}
-	}(response.Body)
-
-	all, err := io.ReadAll(response.Body)
-	if err != nil {
-		return backend.ErrDataResponse(backend.StatusBadRequest, fmt.Sprintf("read failed: %v", err.Error()))
-	}
-
-	var snap deepTp.Snapshot
-	err = proto.Unmarshal(all, &snap)
-	if err != nil {
-		return backend.ErrDataResponse(backend.StatusBadRequest, fmt.Sprintf("response failed: %v", err.Error()))
-	}
-
-	frame, err := snapshotToFrame(&snap)
-	if err != nil {
-		return backend.ErrDataResponse(backend.StatusBadRequest, fmt.Sprintf("convertion failed: %v", err.Error()))
-	}
-
-	frame.RefID = query.RefID
-	return backend.DataResponse{
-		Frames: []*data.Frame{frame},
-	}
+	return d.processProtoSnapshotResponse(qm.Query, query, response)
 }
 
-func pollResponseToFrame(pollResponse *deepPoll.PollResponse) (*data.Frame, error) {
+func searchResultToFrame(snapshots []*SnapshotSearchMetadata, pluginContext backend.PluginContext) (*data.Frame, error) {
+	frame := &data.Frame{
+		Name: "Search",
+		Fields: []*data.Field{
+			data.NewField("snapshotID", nil, []string{}).SetConfig(&data.FieldConfig{
+				DisplayNameFromDS: "Snapshot ID",
+				Unit:              "string",
+				Links: []data.DataLink{
+					{
+						Title: "Snapshot: ${__value.raw}",
+						Internal: &data.InternalDataLink{
+							Query: struct {
+								Query     string `json:"query"`
+								QueryType string `json:"queryType"`
+							}{
+								QueryType: "byid",
+								Query:     "${__value.raw}",
+							},
+							DatasourceUID:  pluginContext.DataSourceInstanceSettings.UID,
+							DatasourceName: pluginContext.DataSourceInstanceSettings.Name,
+						},
+					},
+				},
+			}),
+			data.NewField("location", nil, []string{}).SetConfig(&data.FieldConfig{DisplayNameFromDS: "Snapshot Location"}),
+			data.NewField("startTime", nil, []time.Time{}).SetConfig(&data.FieldConfig{DisplayNameFromDS: "Start Time"}),
+			data.NewField("duration", nil, []int64{}).SetConfig(&data.FieldConfig{DisplayNameFromDS: "Duration", Unit: "ns"}),
+		},
+		Meta: &data.FrameMeta{
+			PreferredVisualization: "table",
+		},
+	}
+
+	for _, snapshot := range snapshots {
+		duration, err := parseInt(snapshot.DurationNano)
+		if err != nil {
+			duration = 0
+		}
+		frame.AppendRow(snapshot.SnapshotID, snapshotLocation(snapshot), parseTime(snapshot.StartTimeUnixNano), duration)
+	}
+	return frame, nil
+}
+
+func parseInt(nano string) (int64, error) {
+	atoi, err := strconv.Atoi(nano)
+	return int64(atoi), err
+}
+
+func parseTime(nano string) time.Time {
+	i, err := parseInt(nano)
+	if err != nil {
+		return time.Unix(0, 0)
+	}
+
+	unix := time.Unix(0, i)
+	return unix
+}
+
+func snapshotLocation(snapshot *SnapshotSearchMetadata) string {
+	return strings.TrimLeft(fmt.Sprintf("%s %s:%d", snapshot.ServiceName, snapshot.FilePath, snapshot.LineNo), " ")
+}
+
+func pollResponseToFrame(pollResponse []*deepTp.TracePointConfig, pluginContext backend.PluginContext) (*data.Frame, error) {
 	frame := &data.Frame{
 		Name: "Tracepoint",
 		Fields: []*data.Field{
-			data.NewField("ID", nil, []string{}),
+			data.NewField("ID", nil, []string{}).SetConfig(&data.FieldConfig{
+				DisplayNameFromDS: "Tracepoint ID",
+				Unit:              "string",
+				Links: []data.DataLink{
+					{
+						Title: "View: ${__value.raw}",
+						Internal: &data.InternalDataLink{
+							Query: struct {
+								Query     string `json:"query"`
+								QueryType string `json:"queryType"`
+							}{
+								QueryType: "deepql",
+								Query:     "{ tracepoint=\"${__value.raw}\" }",
+							},
+							DatasourceUID:  pluginContext.DataSourceInstanceSettings.UID,
+							DatasourceName: pluginContext.DataSourceInstanceSettings.Name,
+						},
+					},
+				},
+			}),
 			data.NewField("Path", nil, []string{}),
 			data.NewField("Line", nil, []uint32{}),
 			data.NewField("Args", nil, []json.RawMessage{}),
 			data.NewField("Watches", nil, []json.RawMessage{}),
 			data.NewField("Targeting", nil, []json.RawMessage{}),
+			data.NewField("Delete", nil, []string{}).SetConfig(&data.FieldConfig{
+				DisplayNameFromDS: "Delete",
+				Unit:              "string",
+				Links: []data.DataLink{
+					{
+						Title: "Delete: ${__value.raw}",
+						Internal: &data.InternalDataLink{
+							Query: struct {
+								Query     string `json:"query"`
+								QueryType string `json:"queryType"`
+							}{
+								QueryType: "deepql",
+								Query:     "delete{ id=\"${__value.raw}\" }",
+							},
+							DatasourceUID:  pluginContext.DataSourceInstanceSettings.UID,
+							DatasourceName: pluginContext.DataSourceInstanceSettings.Name,
+						},
+					},
+				},
+			}),
 		},
 		Meta: &data.FrameMeta{
 			PreferredVisualization:         "table",
@@ -237,11 +290,11 @@ func pollResponseToFrame(pollResponse *deepPoll.PollResponse) (*data.Frame, erro
 		},
 	}
 
-	for _, tp := range pollResponse.Response {
+	for _, tp := range pollResponse {
 		tpArgs, _ := json.Marshal(tp.Args)
 		tpWatches, _ := json.Marshal(tp.Watches)
 		tpTargeting, _ := json.Marshal(keyValuesToMap(tp.Targeting))
-		frame.AppendRow(tp.ID, tp.Path, tp.LineNumber, json.RawMessage(tpArgs), json.RawMessage(tpWatches), json.RawMessage(tpTargeting))
+		frame.AppendRow(tp.ID, tp.Path, tp.LineNumber, json.RawMessage(tpArgs), json.RawMessage(tpWatches), json.RawMessage(tpTargeting), tp.ID)
 	}
 
 	return frame, nil
@@ -362,6 +415,7 @@ func (d *DeepDatasource) CheckHealth(_ context.Context, req *backend.CheckHealth
 		}, nil
 	}
 
+	attachHeaders(request, req.Headers)
 	response, err := d.client.Do(request)
 
 	if err != nil {
@@ -401,4 +455,178 @@ func (d *DeepDatasource) CheckHealth(_ context.Context, req *backend.CheckHealth
 		Status:  backend.HealthStatusOk,
 		Message: "Data source is working",
 	}, nil
+}
+
+func (d *DeepDatasource) queryDeepQl(ctx context.Context, req *backend.QueryDataRequest, query backend.DataQuery) backend.DataResponse {
+
+	// Unmarshal the JSON into our queryModel.
+	var qm queryModel
+
+	err := json.Unmarshal(query.JSON, &qm)
+	if err != nil {
+		return backend.ErrDataResponse(backend.StatusBadRequest, fmt.Sprintf("json unmarshal: %v", err.Error()))
+	}
+
+	url := fmt.Sprintf("%v/api/search", req.PluginContext.DataSourceInstanceSettings.URL)
+
+	request, err := http.NewRequest(http.MethodGet, url, nil)
+	if err != nil {
+		return backend.ErrDataResponse(backend.StatusBadRequest, fmt.Sprintf("cannot build request: %v", err.Error()))
+	}
+	attachHeaders(request, req.Headers)
+
+	values := request.URL.Query()
+	values.Set("q", qm.Query)
+	values.Set("limit", strconv.Itoa(int(qm.Limit)))
+	values.Set("start", strconv.FormatInt(query.TimeRange.From.Unix(), 10))
+	values.Set("end", strconv.FormatInt(query.TimeRange.To.Unix(), 10))
+	request.URL.RawQuery = values.Encode()
+	request.Header.Add("Accept", "application/json")
+
+	response, err := d.client.Do(request)
+	if err != nil {
+		return backend.ErrDataResponse(backend.StatusBadRequest, fmt.Sprintf("request failed: %v", err.Error()))
+	}
+
+	if response.StatusCode != 200 {
+		defer func(Body io.ReadCloser) {
+			err := Body.Close()
+			if err != nil {
+				_ = d.log.Log("msg", "failed to close response body", "err", err)
+			}
+		}(response.Body)
+
+		all, err := io.ReadAll(response.Body)
+		if err != nil {
+			return backend.ErrDataResponse(backend.StatusBadRequest, fmt.Sprintf("read failed: %v", err.Error()))
+		}
+		return backend.ErrDataResponse(backend.StatusBadRequest, fmt.Sprintf("request failed: %d %s", response.StatusCode, string(all)))
+	}
+	responseType := response.Header.Get("x-deepql-type")
+	if responseType == "" {
+
+		defer func(Body io.ReadCloser) {
+			err := Body.Close()
+			if err != nil {
+				_ = d.log.Log("msg", "failed to close response body", "err", err)
+			}
+		}(response.Body)
+
+		all, err := io.ReadAll(response.Body)
+		if err != nil {
+			return backend.ErrDataResponse(backend.StatusBadRequest, fmt.Sprintf("read failed: %v", err.Error()))
+		}
+
+		var snapResp SearchResponse
+		err = json.Unmarshal(all, &snapResp)
+		if err != nil {
+			return backend.ErrDataResponse(backend.StatusBadRequest, fmt.Sprintf("response failed: %v", err.Error()))
+		}
+
+		if snapResp.Snapshots != nil {
+			frame, err := searchResultToFrame(snapResp.Snapshots, req.PluginContext)
+			if err != nil {
+				return backend.ErrDataResponse(backend.StatusBadRequest, fmt.Sprintf("convertion failed: %v", err.Error()))
+			}
+
+			frame.RefID = query.RefID
+			return backend.DataResponse{
+				Frames: []*data.Frame{frame},
+			}
+		}
+	}
+	if responseType == "tracepoint" {
+		var pollResponse deeppb.DeepQlResponse
+		err = jsonpb.Unmarshal(response.Body, &pollResponse)
+		if err != nil {
+			return backend.ErrDataResponse(backend.StatusBadRequest, fmt.Sprintf("response failed: %v", err.Error()))
+		}
+		if pollResponse.Type == "list" {
+			return d.processTracepointResponse(query, pollResponse.Affected, req.PluginContext)
+		}
+		return d.processTracepointResponse(query, pollResponse.All, req.PluginContext)
+	}
+
+	return backend.DataResponse{
+		Frames: []*data.Frame{},
+	}
+}
+
+func attachHeaders(request *http.Request, headers map[string]string) {
+	for k, v := range headers {
+		request.Header.Add(k, v)
+	}
+}
+
+func (d *DeepDatasource) processProtoTracepointResponse(query backend.DataQuery, response *http.Response, pluginContext backend.PluginContext) backend.DataResponse {
+
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			_ = d.log.Log("msg", "failed to close response body", "err", err)
+		}
+	}(response.Body)
+
+	all, err := io.ReadAll(response.Body)
+	if err != nil {
+		return backend.ErrDataResponse(backend.StatusBadRequest, fmt.Sprintf("read failed: %v", err.Error()))
+	}
+
+	var pollResponse deepPoll.PollResponse
+	err = proto.Unmarshal(all, &pollResponse)
+	if err != nil {
+		return backend.ErrDataResponse(backend.StatusBadRequest, fmt.Sprintf("response failed: %v", err.Error()))
+	}
+
+	return d.processTracepointResponse(query, pollResponse.Response, pluginContext)
+}
+
+func (d *DeepDatasource) processTracepointResponse(query backend.DataQuery, pollResponse []*deepTp.TracePointConfig, pluginContext backend.PluginContext) backend.DataResponse {
+	frame, err := pollResponseToFrame(pollResponse, pluginContext)
+	if err != nil {
+		return backend.ErrDataResponse(backend.StatusBadRequest, fmt.Sprintf("convertion failed: %v", err.Error()))
+	}
+
+	frame.RefID = query.RefID
+	return backend.DataResponse{
+		Frames: []*data.Frame{frame},
+	}
+}
+
+func (d *DeepDatasource) processProtoSnapshotResponse(id string, query backend.DataQuery, response *http.Response) backend.DataResponse {
+	if response.StatusCode == 404 {
+		return backend.ErrDataResponse(backend.StatusNotFound, fmt.Sprintf("Cannot find snapshot with id: %s", id))
+	}
+
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			_ = d.log.Log("msg", "failed to close response body", "err", err)
+		}
+	}(response.Body)
+
+	all, err := io.ReadAll(response.Body)
+	if err != nil {
+		return backend.ErrDataResponse(backend.StatusBadRequest, fmt.Sprintf("read failed: %v", err.Error()))
+	}
+
+	var snap deepTp.Snapshot
+	err = proto.Unmarshal(all, &snap)
+	if err != nil {
+		return backend.ErrDataResponse(backend.StatusBadRequest, fmt.Sprintf("response failed: %v", err.Error()))
+	}
+
+	return d.processSnapshotResponse(&snap, query)
+}
+
+func (d *DeepDatasource) processSnapshotResponse(snap *deepTp.Snapshot, query backend.DataQuery) backend.DataResponse {
+	frame, err := snapshotToFrame(snap)
+	if err != nil {
+		return backend.ErrDataResponse(backend.StatusBadRequest, fmt.Sprintf("convertion failed: %v", err.Error()))
+	}
+
+	frame.RefID = query.RefID
+	return backend.DataResponse{
+		Frames: []*data.Frame{frame},
+	}
 }

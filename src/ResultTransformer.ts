@@ -18,70 +18,6 @@
 import { DeepDatasourceOptions, SnapshotSearchMetadata, SnapshotTableData } from './types';
 import { DataFrame, DataQueryResponse, DataSourceInstanceSettings, dateTimeFormat, FieldType } from '@grafana/data';
 
-export function createTableFrameFromDeepQlQuery(
-  data: SnapshotSearchMetadata[],
-  instanceSettings: DataSourceInstanceSettings
-): DataFrame[] {
-  const frame: DataFrame = {
-    fields: [
-      {
-        name: 'snapshotID',
-        type: FieldType.string,
-        values: [],
-        config: {
-          unit: 'string',
-          displayNameFromDS: 'Snapshot ID',
-          custom: {
-            width: 200,
-          },
-          links: [
-            {
-              title: 'Snapshot: ${__value.raw}',
-              url: '',
-              internal: {
-                datasourceUid: instanceSettings.uid,
-                datasourceName: instanceSettings.name,
-                query: {
-                  query: '${__value.raw}',
-                  queryType: 'byid',
-                },
-              },
-            },
-          ],
-        },
-      },
-      { name: 'location', values: [], type: FieldType.string, config: { displayNameFromDS: 'Snapshot Location' } },
-      { name: 'startTime', values: [], type: FieldType.string, config: { displayNameFromDS: 'Start time' } },
-      { name: 'duration', values: [], type: FieldType.number, config: { displayNameFromDS: 'Duration', unit: 'ns' } },
-    ],
-    meta: {
-      preferredVisualisationType: 'table',
-    },
-    length: 0,
-  };
-
-  if (!data?.length) {
-    return [frame];
-  }
-
-  const subDataFrames: DataFrame[] = [];
-  const tableRows = data
-    // Show the most recent traces
-    .sort((a, b) => parseInt(b?.startTimeUnixNano!, 10) / 1000000 - parseInt(a?.startTimeUnixNano!, 10) / 1000000)
-    .reduce((rows: SnapshotTableData[], trace) => {
-      const traceData: SnapshotTableData = transformToTraceData(trace);
-      rows.push(traceData);
-      // subDataFrames.push(traceSubFrame(trace, instanceSettings, currentIndex));
-      return rows;
-    }, []);
-
-  for (const row of tableRows) {
-    addRow(frame, row.snapshotID, row.location, row.startTime, row.durationNano);
-  }
-
-  return [frame, ...subDataFrames];
-}
-
 function addRow(frame: DataFrame, ...values: any[]) {
   if (values.length !== frame.fields.length) {
     throw new Error('row and field length mismatch');
@@ -165,7 +101,7 @@ function transformToTraceData(data: SnapshotSearchMetadata): SnapshotTableData {
   return {
     snapshotID: data.snapshotID,
     startTime,
-    duration: data.durationNano?.toString(),
+    durationNano: data.durationNano?.toString(),
     location,
   };
 }
@@ -222,6 +158,35 @@ export function transformTracepoint(
     },
     values: [...response.data[0].fields[0].values],
   });
+
+  return response;
+}
+
+export function transformSearchResult(
+  snapshots: SnapshotSearchMetadata[],
+  instanceSettings: DataSourceInstanceSettings<DeepDatasourceOptions>
+): DataQueryResponse {
+  return {
+    data: [createTableFrameFromSearch(snapshots, instanceSettings)],
+  };
+}
+
+export function transformDeepQlResponse(
+  response: DataQueryResponse,
+  instanceSettings: DataSourceInstanceSettings<DeepDatasourceOptions>
+): DataQueryResponse {
+  const responseType = response.data[0].meta.custom.type;
+  if (responseType === 'byid') {
+    return transformSnapshot(response);
+  }
+
+  if (responseType === 'search') {
+    return response;
+  }
+
+  if (responseType === 'tracepoint') {
+    return transformTracepoint(response, instanceSettings);
+  }
 
   return response;
 }

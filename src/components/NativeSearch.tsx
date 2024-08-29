@@ -25,7 +25,7 @@ import { Alert, fuzzyMatch, InlineField, InlineFieldRow, InlineLabel, Input, Sel
 import { TagsField } from './TagsField/TagsField';
 import { Props } from './QueryEditor';
 import DeepLanguageProvider from '../deepql/DeepLanguageProvider';
-import { DEFAULT_LIMIT } from '../deepql/DeepDataSource';
+import { DEFAULT_LIMIT } from '../DeepDataSource';
 
 const NativeSearch = ({ datasource, query, onChange, onBlur, onRunQuery }: Props) => {
   const styles = useStyles2(getStyles);
@@ -117,7 +117,7 @@ const NativeSearch = ({ datasource, query, onChange, onBlur, onRunQuery }: Props
               inputId="service"
               options={serviceOptions}
               onOpenMenu={() => {
-                loadOptions('serviceName');
+                loadOptions('serviceName').then(setServiceOptions);
               }}
               isLoading={isLoading.serviceName}
               value={serviceOptions?.find((v) => v?.value === query.serviceName) || query.serviceName}
