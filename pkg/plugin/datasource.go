@@ -286,7 +286,7 @@ func pollResponseToFrame(pollResponse []*deepTp.TracePointConfig, pluginContext 
 		},
 		Meta: &data.FrameMeta{
 			PreferredVisualization:         "table",
-			PreferredVisualizationPluginID: "intergral-deep-tracepoint-panel",
+			PreferredVisualizationPluginID: "intergral-deeptracepoint-panel",
 		},
 	}
 
