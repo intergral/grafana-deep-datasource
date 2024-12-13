@@ -1,3 +1,10 @@
+<!-- 1.0.5 Start -->
+
+# 1.0.5 (13/12/2024)
+
+- **[BUGFIX]**: Fix issue with tracepoint create [#59](https://github.com/intergral/deep/pull/59) [@Umaaz](https://github.com/Umaaz)
+
+<!-- 1.0.5 END -->
 <!-- 1.0.4 Start -->
 
 # 1.0.4 (06/05/2024)
