@@ -264,7 +264,7 @@ export class DeepDataSource extends DataSourceWithBackend<DeepQuery, DeepDatasou
       url: `${this.instanceSettings.url}/api/tracepoints`,
       method: 'post',
       data: {
-        Tracepoint: {
+        tracepoint: {
           path: appliedQuery.tpCreate.path,
           line_number: appliedQuery.tpCreate.line_number,
           args: {
